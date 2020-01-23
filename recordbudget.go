@@ -66,7 +66,7 @@ func main() {
 
 	err := server.RegisterServerV2("recordbudget", false, true)
 	if err != nil {
-		log.Fatalf("Unable to register: %v", err)
+		return
 	}
 
 	fmt.Printf("%v", server.Serve())
