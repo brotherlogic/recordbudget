@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package recordbudget;
+
+message Config {
+  int64 last_recordcollection_pull = 1;
+}

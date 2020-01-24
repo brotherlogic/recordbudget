@@ -11,17 +11,25 @@ import (
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	pb "github.com/brotherlogic/recordbudget/proto"
+)
+
+const (
+	// CONFIG storage key
+	CONFIG = "/github.com/brotherlogic/recordbudget/config"
 )
 
 //Server main server type
 type Server struct {
 	*goserver.GoServer
+	config *pb.Config
 }
 
 // Init builds the server
 func Init() *Server {
 	s := &Server{
 		GoServer: &goserver.GoServer{},
+		config:   &pb.Config{},
 	}
 	return s
 }
@@ -39,6 +47,26 @@ func (s *Server) ReportHealth() bool {
 //Shutdown the server
 func (s *Server) Shutdown(ctx context.Context) error {
 	return nil
+}
+
+func (s *Server) load(ctx context.Context) error {
+	config := &pb.Config{}
+	data, _, err := s.KSclient.Read(ctx, CONFIG, config)
+
+	if err != nil {
+		return err
+	}
+
+	config, ok := data.(*pb.Config)
+	if !ok {
+		return fmt.Errorf("Unable to parse config")
+	}
+	s.config = config
+	return nil
+}
+
+func (s *Server) save(ctx context.Context) error {
+	return s.KSclient.Save(ctx, CONFIG, s.config)
 }
 
 // Mote promotes/demotes this server
