@@ -7,22 +7,71 @@ import (
 	"log"
 
 	"github.com/brotherlogic/goserver"
+	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/resolver"
 
 	pbg "github.com/brotherlogic/goserver/proto"
 	pb "github.com/brotherlogic/recordbudget/proto"
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
+
+func init() {
+	resolver.Register(&utils.DiscoveryServerResolverBuilder{})
+}
 
 const (
 	// CONFIG storage key
 	CONFIG = "/github.com/brotherlogic/recordbudget/config"
 )
 
+type rc interface {
+	getRecordsSince(ctx context.Context, timeFrom int64) ([]int32, error)
+	getRecord(ctx context.Context, id int32) (*rcpb.Record, error)
+}
+
+type prc struct{}
+
+func (p *prc) getRecordsSince(ctx context.Context, since int64) ([]int32, error) {
+	conn, err := grpc.Dial("discovery:///recordcollection", grpc.WithInsecure())
+
+	if err != nil {
+		return []int32{}, err
+	}
+	defer conn.Close()
+
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	resp, err := client.QueryRecords(ctx, &rcpb.QueryRecordsRequest{Query: &rcpb.QueryRecordsRequest_UpdateTime{since}})
+
+	if err != nil {
+		return []int32{}, err
+	}
+
+	return resp.GetInstanceIds(), err
+}
+func (p *prc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, error) {
+	conn, err := grpc.Dial("discovery:///recordcollection", grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	resp, err := client.GetRecord(ctx, &rcpb.GetRecordRequest{InstanceId: instanceID})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetRecord(), err
+}
+
 //Server main server type
 type Server struct {
 	*goserver.GoServer
 	config *pb.Config
+	rc     rc
 }
 
 // Init builds the server
@@ -30,6 +79,7 @@ func Init() *Server {
 	s := &Server{
 		GoServer: &goserver.GoServer{},
 		config:   &pb.Config{},
+		rc:       &prc{},
 	}
 	return s
 }
@@ -96,6 +146,8 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	server.RegisterLockingTask(server.rebuildBudget, "rebuild_budget")
 
 	fmt.Printf("%v", server.Serve())
 }
