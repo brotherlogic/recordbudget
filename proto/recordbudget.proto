@@ -4,4 +4,17 @@ package recordbudget;
 
 message Config {
   int64 last_recordcollection_pull = 1;
+  repeated BoughtRecord purchases = 2;
+  repeated PreBoughtRecord pre_purchases = 3;
+}
+
+message BoughtRecord {
+  int32 instance_id = 1;
+  int32 cost = 2;
+  int64 bought_date = 3;
+}
+
+message PreBoughtRecord {
+  int32 id = 1;
+  int32 cost = 2;
 }
