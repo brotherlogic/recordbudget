@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"github.com/brotherlogic/goserver/utils"
@@ -127,6 +128,23 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{}
+}
+
+func (s *Server) runBudget(ctx context.Context) (time.Time, error) {
+	err := s.load(ctx)
+	if err != nil {
+		return time.Now().Add(time.Minute * 5), err
+	}
+	t, err := s.rebuildBudget(ctx)
+	if err == nil {
+		err = s.save(ctx)
+	}
+	if err != nil {
+		return time.Now().Add(time.Minute * 5), err
+	}
+
+	s.Log(fmt.Sprintf("Have %v records in purchase", len(s.config.GetPurchases())))
+	return t, err
 }
 
 func main() {
