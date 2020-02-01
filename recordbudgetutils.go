@@ -47,3 +47,13 @@ func (s *Server) rebuildBudget(ctx context.Context) (time.Time, error) {
 
 	return time.Now().Add(time.Hour * 24), err
 }
+
+func (s Server) getTotalSpend(year int) int32 {
+	spend := int32(0)
+	for _, purchase := range s.config.GetPurchases() {
+		if time.Unix(purchase.GetBoughtDate(), 0).Year() == year {
+			spend += purchase.GetCost()
+		}
+	}
+	return spend
+}

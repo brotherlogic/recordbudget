@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"golang.org/x/net/context"
 
@@ -88,5 +89,16 @@ func TestProcessRecWithGetFail(t *testing.T) {
 
 	if err == nil {
 		t.Errorf("Bad proc did not fail")
+	}
+}
+
+func TestGetSpend(t *testing.T) {
+	s := InitTestServer()
+	s.config.Purchases = append(s.config.Purchases, &pb.BoughtRecord{BoughtDate: time.Now().Unix(), Cost: 100})
+
+	val := s.getTotalSpend(time.Now().Year())
+
+	if val != 100 {
+		t.Errorf("Bad calc: %v", val)
 	}
 }
