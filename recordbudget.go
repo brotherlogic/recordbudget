@@ -127,7 +127,9 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{}
+	return []*pbg.State{
+		&pbg.State{Key: fmt.Sprintf("total_spend_%v", time.Now().Year()), Value: int64(s.getTotalSpend(time.Now().Year()))},
+	}
 }
 
 func (s *Server) runBudget(ctx context.Context) (time.Time, error) {
