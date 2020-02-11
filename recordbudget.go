@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/resolver"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	rapb "github.com/brotherlogic/recordadder/proto"
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
@@ -26,6 +27,31 @@ const (
 	// CONFIG storage key
 	CONFIG = "/github.com/brotherlogic/recordbudget/config"
 )
+
+type ra interface {
+	getAdds(ctx context.Context) ([]*rapb.AddRecordRequest, error)
+}
+
+type pra struct{}
+
+func (p *pra) getAdds(ctx context.Context) ([]*rapb.AddRecordRequest, error) {
+	conn, err := grpc.Dial("discovery:///recordadder", grpc.WithInsecure())
+
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := rapb.NewAddRecordServiceClient(conn)
+	resp, err := client.ListQueue(ctx, &rapb.ListQueueRequest{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetRequests(), err
+
+}
 
 type rc interface {
 	getRecordsSince(ctx context.Context, timeFrom int64) ([]int32, error)
