@@ -8,9 +8,22 @@ import (
 	"golang.org/x/net/context"
 
 	gdpb "github.com/brotherlogic/godiscogs"
+	rapb "github.com/brotherlogic/recordadder/proto"
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
+
+type tra struct {
+	fail bool
+}
+
+func (t *tra) getAdds(ctx context.Context) ([]*rapb.AddRecordRequest, error) {
+	if t.fail {
+		return []*rapb.AddRecordRequest{}, fmt.Errorf("Built to fail")
+	}
+
+	return []*rapb.AddRecordRequest{&rapb.AddRecordRequest{Id: 12}}, nil
+}
 
 type trc struct {
 	fail    bool
@@ -33,6 +46,7 @@ func (t *trc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, er
 func InitTestServer() *Server {
 	s := Init()
 	s.rc = &trc{}
+	s.ra = &tra{}
 	s.SkipLog = true
 	return s
 }
@@ -100,5 +114,34 @@ func TestGetSpend(t *testing.T) {
 
 	if val != 100 {
 		t.Errorf("Bad calc: %v", val)
+	}
+}
+
+func TestFailPre(t *testing.T) {
+	s := InitTestServer()
+	s.ra = &tra{fail: true}
+
+	_, err := s.rebuildPreBudget(context.Background())
+
+	if err == nil {
+		t.Errorf("Bad ra did not fail")
+	}
+}
+
+func TestPre(t *testing.T) {
+	s := InitTestServer()
+
+	_, err := s.rebuildPreBudget(context.Background())
+	if err != nil {
+		t.Errorf("Bad rebuild: %v", err)
+	}
+
+	_, err = s.rebuildPreBudget(context.Background())
+	if err != nil {
+		t.Errorf("Bad rebuild: %v", err)
+	}
+
+	if len(s.config.GetPrePurchases()) != 1 {
+		t.Errorf("Bad adds: %v", s.config)
 	}
 }

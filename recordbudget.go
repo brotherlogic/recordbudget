@@ -99,6 +99,7 @@ type Server struct {
 	*goserver.GoServer
 	config *pb.Config
 	rc     rc
+	ra     ra
 }
 
 // Init builds the server
@@ -107,6 +108,7 @@ func Init() *Server {
 		GoServer: &goserver.GoServer{},
 		config:   &pb.Config{},
 		rc:       &prc{},
+		ra:       &pra{},
 	}
 	return s
 }
