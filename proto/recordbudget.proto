@@ -18,3 +18,16 @@ message PreBoughtRecord {
   int32 id = 1;
   int32 cost = 2;
 }
+
+message GetBudgetRequest {
+  int32 year = 1;
+}
+
+message GetBudgetResponse {
+  int32 spends = 1;
+  int32 budget = 2;
+}
+
+service RecordBudgetService {
+  rpc GetBudget(GetBudgetRequest) returns (GetBudgetResponse) {};
+}
