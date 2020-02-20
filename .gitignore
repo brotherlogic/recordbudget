@@ -1,5 +1,5 @@
 *~
 recordbudget
 .test
-
+recordbudget_cli/recordbudget_cli
 *.txt
