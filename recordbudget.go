@@ -11,9 +11,7 @@ import (
 	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/resolver"
-	"google.golang.org/grpc/status"
 
 	pbg "github.com/brotherlogic/goserver/proto"
 	rapb "github.com/brotherlogic/recordadder/proto"
@@ -135,13 +133,6 @@ func (s *Server) load(ctx context.Context) error {
 	data, _, err := s.KSclient.Read(ctx, CONFIG, config)
 
 	if err != nil {
-
-		if status.Convert(err).Code() == codes.NotFound {
-			s.Log(fmt.Sprintf("Force Save"))
-			s.config.LastRecordcollectionPull = time.Now().Unix()
-			s.save(ctx)
-		}
-
 		return err
 	}
 
