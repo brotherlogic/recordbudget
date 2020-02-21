@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 
 	gdpb "github.com/brotherlogic/godiscogs"
@@ -48,6 +49,8 @@ func InitTestServer() *Server {
 	s.rc = &trc{}
 	s.ra = &tra{}
 	s.SkipLog = true
+	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
+	s.GoServer.KSclient.Save(context.Background(), CONFIG, &pb.Config{})
 	return s
 }
 

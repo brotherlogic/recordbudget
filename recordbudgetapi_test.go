@@ -4,8 +4,9 @@ import (
 	"testing"
 	"time"
 
-	pb "github.com/brotherlogic/recordbudget/proto"
 	"golang.org/x/net/context"
+
+	pb "github.com/brotherlogic/recordbudget/proto"
 )
 
 func TestBasicCall(t *testing.T) {
@@ -21,6 +22,7 @@ func TestSpends(t *testing.T) {
 	s := InitTestServer()
 	s.config.Purchases = append(s.config.Purchases, &pb.BoughtRecord{BoughtDate: time.Now().Unix(), Cost: 100})
 	s.config.PrePurchases = append(s.config.PrePurchases, &pb.PreBoughtRecord{Id: 12, Cost: 200})
+	s.save(context.Background())
 
 	b, err := s.GetBudget(context.Background(), &pb.GetBudgetRequest{Year: int32(time.Now().Year())})
 	if err != nil {
@@ -29,5 +31,15 @@ func TestSpends(t *testing.T) {
 
 	if b.GetSpends() != 300 {
 		t.Errorf("Bad budget: %v", b)
+	}
+}
+
+func TestSpendsWithFail(t *testing.T) {
+	s := InitTestServer()
+	s.GoServer.KSclient.Fail = true
+
+	b, err := s.GetBudget(context.Background(), &pb.GetBudgetRequest{Year: int32(time.Now().Year())})
+	if err == nil {
+		t.Errorf("Should have failed: %v", b)
 	}
 }

@@ -38,6 +38,11 @@ func (s *Server) getBudget(ctx context.Context, t time.Time) int32 {
 
 //GetBudget API Call
 func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.GetBudgetResponse, error) {
+	err := s.load(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	spends := s.computeSpends(ctx, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
 
