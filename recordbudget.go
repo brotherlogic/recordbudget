@@ -141,6 +141,7 @@ func (s *Server) load(ctx context.Context) error {
 		return fmt.Errorf("Unable to parse config")
 	}
 	s.config = config
+	s.config.LastRecordcollectionPull = time.Now().Add(time.Hour * 24 * 200).Unix()
 	return nil
 }
 
