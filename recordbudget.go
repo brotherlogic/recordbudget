@@ -156,6 +156,8 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
+		&pbg.State{Key: "purchases", Value: int64(len(s.config.GetPurchases()))},
+		&pbg.State{Key: "pre_purchases", Value: int64(len(s.config.GetPrePurchases()))},
 		&pbg.State{Key: fmt.Sprintf("total_spend_%v", time.Now().Year()), Value: int64(s.getTotalSpend(time.Now().Year()))},
 	}
 }
@@ -195,7 +197,7 @@ func main() {
 		return
 	}
 
-	server.RegisterLockingTask(server.rebuildBudget, "rebuild_budget")
+	server.RegisterLockingTask(server.runBudget, "rebuild_budget")
 
 	fmt.Printf("%v", server.Serve())
 }
