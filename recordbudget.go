@@ -176,7 +176,7 @@ func (s *Server) runBudget(ctx context.Context) (time.Time, error) {
 		return time.Now().Add(time.Minute * 5), err
 	}
 
-	s.Log(fmt.Sprintf("Have %v records in purchase", len(s.config.GetPurchases())))
+	s.Log(fmt.Sprintf("Have %v records in purchase, %v in pre-purchase", len(s.config.GetPurchases()), len(s.config.GetPrePurchases())))
 	return t, err
 }
 

@@ -45,7 +45,7 @@ func (s *Server) rebuildBudget(ctx context.Context) (time.Time, error) {
 		}
 	}
 
-	return time.Now().Add(time.Hour * 24), err
+	return time.Now().Add(time.Hour * 1), err
 }
 
 func (s *Server) rebuildPreBudget(ctx context.Context) (time.Time, error) {
@@ -67,7 +67,7 @@ func (s *Server) rebuildPreBudget(ctx context.Context) (time.Time, error) {
 		}
 	}
 
-	return time.Now().Add(time.Hour * 24), err
+	return time.Now().Add(time.Hour * 1), err
 }
 
 func (s Server) getTotalSpend(year int) int32 {
