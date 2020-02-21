@@ -176,6 +176,14 @@ func (s *Server) runBudget(ctx context.Context) (time.Time, error) {
 		return time.Now().Add(time.Minute * 5), err
 	}
 
+	t, err = s.rebuildPreBudget(ctx)
+	if err == nil {
+		err = s.save(ctx)
+	}
+	if err != nil {
+		return time.Now().Add(time.Minute * 5), err
+	}
+
 	s.Log(fmt.Sprintf("Have %v records in purchase, %v in pre-purchase", len(s.config.GetPurchases()), len(s.config.GetPrePurchases())))
 	return t, err
 }
