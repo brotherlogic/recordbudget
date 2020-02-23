@@ -13,8 +13,9 @@ const (
 	MONTHLYBUDGET = 400
 )
 
-func (s *Server) computeSpends(ctx context.Context, year int) (int32, []int32) {
+func (s *Server) computeSpends(ctx context.Context, year int) (int32, []int32, []int32) {
 	resp := []int32{}
+	pre := []int32{}
 	spends := int32(0)
 	for _, bought := range s.config.GetPurchases() {
 		date := time.Unix(bought.GetBoughtDate(), 0)
@@ -25,10 +26,11 @@ func (s *Server) computeSpends(ctx context.Context, year int) (int32, []int32) {
 	}
 
 	for _, prebought := range s.config.GetPrePurchases() {
+		pre = append(pre, prebought.GetId())
 		spends += prebought.GetCost()
 	}
 
-	return spends, resp
+	return spends, resp, pre
 }
 
 func (s *Server) getBudget(ctx context.Context, t time.Time) int32 {
@@ -45,8 +47,8 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
-	spends, ids := s.computeSpends(ctx, int(req.GetYear()))
+	spends, ids, pre := s.computeSpends(ctx, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
 
-	return &pb.GetBudgetResponse{Spends: spends, Budget: budget, PurchasedIds: ids}, nil
+	return &pb.GetBudgetResponse{Spends: spends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre}, nil
 }

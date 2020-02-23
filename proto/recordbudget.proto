@@ -27,6 +27,7 @@ message GetBudgetResponse {
   int32 spends = 1;
   int32 budget = 2;
   repeated int32 purchased_ids = 3;
+  repeated int32 pre_purchased_ids = 4;
 }
 
 service RecordBudgetService {
