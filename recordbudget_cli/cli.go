@@ -35,5 +35,8 @@ func main() {
 			log.Fatalf("Error getting budget: %v", err)
 		}
 		fmt.Printf("You have %v remaining in your budget, You've spent %v so far this year\n", res.GetBudget()-res.GetSpends(), res.GetSpends())
+		for _, p := range res.GetPurchasedIds() {
+			fmt.Printf("Purchase: %v\n", p)
+		}
 	}
 }
