@@ -34,9 +34,13 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error getting budget: %v", err)
 		}
-		fmt.Printf("You have %v remaining in your budget, You've spent %v so far this year\n", res.GetBudget()-res.GetSpends(), res.GetSpends())
+		fmt.Printf("You have %v remaining in your budget, You've spent %v (%v) so far this year\n", res.GetBudget()-res.GetSpends(), res.GetSpends(), res.GetBudget())
 		for _, p := range res.GetPurchasedIds() {
 			fmt.Printf("Purchase: %v\n", p)
+		}
+
+		for _, p := range res.GetPrePurchasedIds() {
+			fmt.Printf("PrePurchase: %v\n", p)
 		}
 	}
 }

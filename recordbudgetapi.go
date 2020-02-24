@@ -37,7 +37,7 @@ func (s *Server) getBudget(ctx context.Context, t time.Time) int32 {
 	dailyBudget := MONTHLYBUDGET * 12 / 365
 	days := t.YearDay()
 
-	return int32(days * dailyBudget)
+	return int32(days * dailyBudget * 100)
 }
 
 //GetBudget API Call
