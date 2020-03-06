@@ -29,8 +29,12 @@ func TestSpends(t *testing.T) {
 		t.Errorf("Bad call: %v", err)
 	}
 
-	if b.GetSpends() != 300 {
+	if b.GetSpends() != 100 {
 		t.Errorf("Bad budget: %v", b)
+	}
+
+	if b.GetPreSpends() != 200 {
+		t.Errorf("Bad budget on pre spends: %v", b)
 	}
 }
 
