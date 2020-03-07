@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/net/context"
@@ -13,6 +14,7 @@ func (s *Server) adjustDate(r *rcpb.Record) int64 {
 	dateAdded := time.Unix(r.GetMetadata().GetDateAdded(), 0)
 	if r.GetMetadata().GetAccountingYear() > 0 {
 		dateAdded = dateAdded.AddDate(int(r.GetMetadata().GetAccountingYear())-dateAdded.Year(), 0, 0)
+		s.Log(fmt.Sprintf("Adjust %v to %v", r.GetRelease().GetTitle(), dateAdded))
 	}
 	return dateAdded.Unix()
 }
@@ -30,6 +32,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	dateAdded := s.adjustDate(r)
+
 	for i, pp := range s.config.GetPrePurchases() {
 		if pp.GetId() == r.GetRelease().GetId() {
 			s.config.PrePurchases = append(s.config.PrePurchases[:i], s.config.PrePurchases[i+1:]...)
