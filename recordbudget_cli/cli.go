@@ -11,10 +11,31 @@ import (
 	"google.golang.org/grpc/resolver"
 
 	pb "github.com/brotherlogic/recordbudget/proto"
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
 
 func init() {
 	resolver.Register(&utils.DiscoveryClientResolverBuilder{})
+}
+
+func getRecord(i int32) string {
+	conn, err := grpc.Dial("discovery:///recordcollection", grpc.WithInsecure(), grpc.WithBalancerName("my_pick_first"))
+	if err != nil {
+		log.Fatalf("Unable to dial: %v", err)
+	}
+	defer conn.Close()
+
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	ctx, cancel := utils.BuildContext("recordbudget-cli", "recordbudget")
+	defer cancel()
+
+	r, err := client.GetRecord(ctx, &rcpb.GetRecordRequest{InstanceId: i})
+
+	if err != nil {
+		return fmt.Sprintf("%v", err)
+	}
+
+	return r.GetRecord().GetRelease().GetArtists()[0].GetName() + " - " + r.GetRecord().GetRelease().GetTitle() + "[" + fmt.Sprintf("%v]", r.GetRecord().GetMetadata().GetCost())
 }
 
 func main() {
@@ -36,7 +57,7 @@ func main() {
 		}
 		fmt.Printf("You have %v remaining in your budget, You've spent %v (%v) so far this year\n", res.GetBudget()-res.GetSpends(), res.GetSpends(), res.GetBudget())
 		for _, p := range res.GetPurchasedIds() {
-			fmt.Printf("Purchase: %v\n", p)
+			fmt.Printf("Purchase: [%v] - %v\n", p, getRecord(p))
 		}
 
 		for _, p := range res.GetPrePurchasedIds() {
