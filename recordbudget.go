@@ -142,6 +142,7 @@ func (s *Server) load(ctx context.Context) error {
 	}
 	s.config = config
 	s.config.LastRecordcollectionPull = time.Now().Add(-time.Hour * 24 * 100).Unix()
+	s.config.Purchases = []*pb.BoughtRecord{}
 	return nil
 }
 
