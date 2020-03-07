@@ -148,3 +148,32 @@ func TestPre(t *testing.T) {
 		t.Errorf("Bad adds: %v", s.config)
 	}
 }
+
+func TestAdjust(t *testing.T) {
+	s := InitTestServer()
+
+	dateAdded, err := time.Parse("2006-01-02", "2019-03-17")
+	if err != nil {
+		t.Fatalf("Error parse: %v", err)
+	}
+
+	d2 := s.adjustDate(&rcpb.Record{Metadata: &rcpb.ReleaseMetadata{DateAdded: dateAdded.Unix()}})
+	if d2 != dateAdded.Unix() {
+		t.Errorf("Mismatch: %v and %v", dateAdded, d2)
+	}
+}
+
+func TestAdjustDoAdjust(t *testing.T) {
+	s := InitTestServer()
+
+	dateAdded, err := time.Parse("2006-01-02", "2019-03-17")
+	dateAdded2, err := time.Parse("2006-01-02", "2018-03-17")
+	if err != nil {
+		t.Fatalf("Error parse: %v", err)
+	}
+
+	d2 := s.adjustDate(&rcpb.Record{Metadata: &rcpb.ReleaseMetadata{DateAdded: dateAdded.Unix(), AccountingYear: int32(2018)}})
+	if d2 != dateAdded2.Unix() {
+		t.Errorf("Mismatch: %v and %v", dateAdded, d2)
+	}
+}

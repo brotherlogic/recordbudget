@@ -6,7 +6,16 @@ import (
 	"golang.org/x/net/context"
 
 	pb "github.com/brotherlogic/recordbudget/proto"
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
+
+func (s *Server) adjustDate(r *rcpb.Record) int64 {
+	dateAdded := time.Unix(r.GetMetadata().GetDateAdded(), 0)
+	if r.GetMetadata().GetAccountingYear() > 0 {
+		dateAdded = dateAdded.AddDate(int(r.GetMetadata().GetAccountingYear())-dateAdded.Year(), 0, 0)
+	}
+	return dateAdded.Unix()
+}
 
 func (s *Server) processRec(ctx context.Context, iid int32) error {
 	for _, r := range s.config.GetPurchases() {
@@ -20,6 +29,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 
+	dateAdded := s.adjustDate(r)
 	for i, pp := range s.config.GetPrePurchases() {
 		if pp.GetId() == r.GetRelease().GetId() {
 			s.config.PrePurchases = append(s.config.PrePurchases[:i], s.config.PrePurchases[i+1:]...)
@@ -27,7 +37,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		}
 	}
 
-	s.config.Purchases = append(s.config.Purchases, &pb.BoughtRecord{InstanceId: iid, Cost: r.GetMetadata().GetCost(), BoughtDate: r.GetMetadata().GetDateAdded()})
+	s.config.Purchases = append(s.config.Purchases, &pb.BoughtRecord{InstanceId: iid, Cost: r.GetMetadata().GetCost(), BoughtDate: dateAdded})
 
 	return nil
 }
