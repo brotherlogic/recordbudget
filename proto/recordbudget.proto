@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package recordbudget;
 
+option go_package = "github.com/brotherlogic/recordbudget/proto";
+
 message Config {
   int64 last_recordcollection_pull = 1;
   repeated BoughtRecord purchases = 2;

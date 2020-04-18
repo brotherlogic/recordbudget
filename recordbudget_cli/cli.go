@@ -18,7 +18,7 @@ func init() {
 	resolver.Register(&utils.DiscoveryClientResolverBuilder{})
 }
 
-func getRecord(i int32) string {
+func getRecord(i int32) (int32, string) {
 	conn, err := grpc.Dial("discovery:///recordcollection", grpc.WithInsecure(), grpc.WithBalancerName("my_pick_first"))
 	if err != nil {
 		log.Fatalf("Unable to dial: %v", err)
@@ -32,10 +32,10 @@ func getRecord(i int32) string {
 	r, err := client.GetRecord(ctx, &rcpb.GetRecordRequest{InstanceId: i})
 
 	if err != nil {
-		return fmt.Sprintf("%v", err)
+		return 0, fmt.Sprintf("%v", err)
 	}
 
-	return r.GetRecord().GetRelease().GetArtists()[0].GetName() + " - " + r.GetRecord().GetRelease().GetTitle() + "[" + fmt.Sprintf("%v]", r.GetRecord().GetMetadata().GetCost())
+	return r.GetRecord().GetMetadata().GetCost(), r.GetRecord().GetRelease().GetArtists()[0].GetName() + " - " + r.GetRecord().GetRelease().GetTitle() + " [" + fmt.Sprintf("%v]", r.GetRecord().GetMetadata().GetCost())
 }
 
 func main() {
@@ -55,9 +55,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error getting budget: %v", err)
 		}
-		fmt.Printf("You have %v remaining in your budget, You've spent %v (%v) so far this year\n", res.GetBudget()-res.GetSpends(), res.GetSpends(), res.GetBudget())
+		fmt.Printf("You have %v remaining in your budget, You've spent %v (%v) so far this year and have %v (%v) to come\n", res.GetBudget()-res.GetSpends(), res.GetSpends(), res.GetBudget(), res.GetPreSpends(), res.GetBudget()-res.GetSpends()-res.GetPreSpends())
 		for _, p := range res.GetPurchasedIds() {
-			fmt.Printf("Purchase: [%v] - %v\n", p, getRecord(p))
+			cost, r := getRecord(p)
+			if cost > 1 {
+				fmt.Printf("Purchase: [%v] - %v\n", p, r)
+			}
 		}
 
 		for _, p := range res.GetPrePurchasedIds() {
