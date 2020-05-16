@@ -9,6 +9,8 @@ import (
 
 	"github.com/brotherlogic/goserver"
 	"github.com/brotherlogic/goserver/utils"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/resolver"
@@ -17,6 +19,13 @@ import (
 	rapb "github.com/brotherlogic/recordadder/proto"
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
+)
+
+var (
+	budgetGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_budget",
+		Help: "The size of the print queue",
+	})
 )
 
 func init() {
@@ -183,6 +192,11 @@ func (s *Server) runBudget(ctx context.Context) (time.Time, error) {
 	if err != nil {
 		return time.Now().Add(time.Minute * 5), err
 	}
+
+	spends, preSpends, _, _ := s.computeSpends(ctx, int(time.Now().Year()))
+	budget := s.getBudget(ctx, time.Now())
+
+	budgetGauge.Set(float64(budget - (spends + preSpends)))
 
 	s.Log(fmt.Sprintf("Have %v records in purchase, %v in pre-purchase", len(s.config.GetPurchases()), len(s.config.GetPrePurchases())))
 	return t, err
