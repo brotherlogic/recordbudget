@@ -220,7 +220,5 @@ func main() {
 		return
 	}
 
-	server.RegisterLockingTask(server.runBudget, "rebuild_budget")
-
 	fmt.Printf("%v", server.Serve())
 }
