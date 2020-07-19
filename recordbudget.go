@@ -125,6 +125,7 @@ func Init() *Server {
 // DoRegister does RPC registration
 func (s *Server) DoRegister(server *grpc.Server) {
 	pb.RegisterRecordBudgetServiceServer(server, s)
+	rcpb.RegisterClientUpdateServiceServer(server, s)
 }
 
 // ReportHealth alerts if we're not healthy
@@ -137,25 +138,23 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func (s *Server) load(ctx context.Context) error {
+func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	config := &pb.Config{}
 	data, _, err := s.KSclient.Read(ctx, CONFIG, config)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	config, ok := data.(*pb.Config)
 	if !ok {
-		return fmt.Errorf("Unable to parse config")
+		return nil, fmt.Errorf("Unable to parse config")
 	}
-	s.config = config
-	s.config.LastRecordcollectionPull = time.Now().Add(-time.Hour * 24 * 100).Unix()
-	return nil
+	return config, nil
 }
 
-func (s *Server) save(ctx context.Context) error {
-	return s.KSclient.Save(ctx, CONFIG, s.config)
+func (s *Server) save(ctx context.Context, config *pb.Config) error {
+	return s.KSclient.Save(ctx, CONFIG, config)
 }
 
 // Mote promotes/demotes this server
@@ -170,36 +169,6 @@ func (s *Server) GetState() []*pbg.State {
 		&pbg.State{Key: "pre_purchases", Value: int64(len(s.config.GetPrePurchases()))},
 		&pbg.State{Key: fmt.Sprintf("total_spend_%v", time.Now().Year()), Value: int64(s.getTotalSpend(time.Now().Year()))},
 	}
-}
-
-func (s *Server) runBudget(ctx context.Context) (time.Time, error) {
-	err := s.load(ctx)
-	if err != nil {
-		return time.Now().Add(time.Minute * 5), err
-	}
-	t, err := s.rebuildBudget(ctx)
-	if err == nil {
-		err = s.save(ctx)
-	}
-	if err != nil {
-		return time.Now().Add(time.Minute * 5), err
-	}
-
-	t, err = s.rebuildPreBudget(ctx)
-	if err == nil {
-		err = s.save(ctx)
-	}
-	if err != nil {
-		return time.Now().Add(time.Minute * 5), err
-	}
-
-	spends, preSpends, _, _ := s.computeSpends(ctx, int(time.Now().Year()))
-	budget := s.getBudget(ctx, time.Now())
-
-	budgetGauge.Set(float64(budget - (spends + preSpends)))
-
-	s.Log(fmt.Sprintf("Have %v records in purchase, %v in pre-purchase", len(s.config.GetPurchases()), len(s.config.GetPrePurchases())))
-	return t, err
 }
 
 func main() {
