@@ -20,7 +20,8 @@ func (s *Server) adjustDate(r *rcpb.Record) int64 {
 }
 
 func (s *Server) processRec(ctx context.Context, iid int32) error {
-	for _, r := range s.config.GetPurchases() {
+	config, err := s.load(ctx)
+	for _, r := range config.GetPurchases() {
 		if r.GetInstanceId() == iid {
 			return nil
 		}
@@ -33,16 +34,16 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 
 	dateAdded := s.adjustDate(r)
 
-	for i, pp := range s.config.GetPrePurchases() {
+	for i, pp := range config.GetPrePurchases() {
 		if pp.GetId() == r.GetRelease().GetId() {
-			s.config.PrePurchases = append(s.config.PrePurchases[:i], s.config.PrePurchases[i+1:]...)
+			config.PrePurchases = append(config.PrePurchases[:i], config.PrePurchases[i+1:]...)
 			break
 		}
 	}
 
-	s.config.Purchases = append(s.config.Purchases, &pb.BoughtRecord{InstanceId: iid, Cost: r.GetMetadata().GetCost(), BoughtDate: dateAdded})
+	config.Purchases = append(config.Purchases, &pb.BoughtRecord{InstanceId: iid, Cost: r.GetMetadata().GetCost(), BoughtDate: dateAdded})
 
-	return nil
+	return s.save(ctx, config)
 }
 
 func (s *Server) rebuildBudget(ctx context.Context) (time.Time, error) {

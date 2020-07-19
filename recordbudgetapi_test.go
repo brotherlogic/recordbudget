@@ -20,9 +20,9 @@ func TestBasicCall(t *testing.T) {
 
 func TestSpends(t *testing.T) {
 	s := InitTestServer()
-	s.config.Purchases = append(s.config.Purchases, &pb.BoughtRecord{BoughtDate: time.Now().Unix(), Cost: 100})
-	s.config.PrePurchases = append(s.config.PrePurchases, &pb.PreBoughtRecord{Id: 12, Cost: 200})
-	s.save(context.Background())
+	//s.config.Purchases = append(s.config.Purchases, &pb.BoughtRecord{BoughtDate: time.Now().Unix(), Cost: 100})
+	//s.config.PrePurchases = append(s.config.PrePurchases, &pb.PreBoughtRecord{Id: 12, Cost: 200})
+	//s.save(context.Background())
 
 	b, err := s.GetBudget(context.Background(), &pb.GetBudgetRequest{Year: int32(time.Now().Year())})
 	if err != nil {
