@@ -49,7 +49,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
-	_, err = s.rebuildPreBudget(ctx)
+	_, err = s.rebuildPreBudget(ctx, config)
 	if err != nil {
 		return nil, err
 	}
