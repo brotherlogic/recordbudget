@@ -62,26 +62,26 @@ func (s *Server) rebuildBudget(ctx context.Context) (time.Time, error) {
 	return time.Now().Add(time.Hour * 1), err
 }
 
-func (s *Server) rebuildPreBudget(ctx context.Context) (time.Time, error) {
+func (s *Server) rebuildPreBudget(ctx context.Context, config *pb.Config) (*pb.Config, error) {
 	recs, err := s.ra.getAdds(ctx)
 	if err != nil {
-		return time.Now().Add(time.Minute * 5), err
+		return nil, err
 	}
 
 	for _, rec := range recs {
 		found := false
-		for _, pre := range s.config.GetPrePurchases() {
+		for _, pre := range config.GetPrePurchases() {
 			if rec.GetId() == pre.GetId() {
 				found = true
 			}
 		}
 
 		if !found {
-			s.config.PrePurchases = append(s.config.PrePurchases, &pb.PreBoughtRecord{Id: rec.GetId(), Cost: rec.GetCost()})
+			config.PrePurchases = append(config.PrePurchases, &pb.PreBoughtRecord{Id: rec.GetId(), Cost: rec.GetCost()})
 		}
 	}
 
-	return time.Now().Add(time.Hour * 1), err
+	return config, err
 }
 
 func (s Server) getTotalSpend(year int) int32 {

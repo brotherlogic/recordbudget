@@ -39,15 +39,16 @@ func getRecord(i int32) (int32, string) {
 }
 
 func main() {
-	conn, err := grpc.Dial("discovery:///recordbudget", grpc.WithInsecure(), grpc.WithBalancerName("my_pick_first"))
+	ctx, cancel := utils.BuildContext("recordbudget-cli", "recordbudget")
+	defer cancel()
+
+	conn, err := utils.LFDialServer(ctx, "recordbudget")
 	if err != nil {
 		log.Fatalf("Unable to dial: %v", err)
 	}
 	defer conn.Close()
 
 	client := pb.NewRecordBudgetServiceClient(conn)
-	ctx, cancel := utils.BuildContext("recordbudget-cli", "recordbudget")
-	defer cancel()
 
 	switch os.Args[1] {
 	case "budget":

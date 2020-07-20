@@ -124,7 +124,7 @@ func TestFailPre(t *testing.T) {
 	s := InitTestServer()
 	s.ra = &tra{fail: true}
 
-	_, err := s.rebuildPreBudget(context.Background())
+	_, err := s.rebuildPreBudget(context.Background(), &pb.Config{})
 
 	if err == nil {
 		t.Errorf("Bad ra did not fail")
@@ -134,12 +134,12 @@ func TestFailPre(t *testing.T) {
 func TestPre(t *testing.T) {
 	s := InitTestServer()
 
-	_, err := s.rebuildPreBudget(context.Background())
+	_, err := s.rebuildPreBudget(context.Background(), &pb.Config{})
 	if err != nil {
 		t.Errorf("Bad rebuild: %v", err)
 	}
 
-	_, err = s.rebuildPreBudget(context.Background())
+	_, err = s.rebuildPreBudget(context.Background(), &pb.Config{})
 	if err != nil {
 		t.Errorf("Bad rebuild: %v", err)
 	}
