@@ -49,6 +49,11 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
+	_, err = s.rebuildPreBudget(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	spends, preSpends, ids, pre := s.computeSpends(ctx, config, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
 
