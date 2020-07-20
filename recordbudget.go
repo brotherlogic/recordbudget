@@ -41,10 +41,12 @@ type ra interface {
 	getAdds(ctx context.Context) ([]*rapb.AddRecordRequest, error)
 }
 
-type pra struct{}
+type pra struct {
+	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
+}
 
 func (p *pra) getAdds(ctx context.Context) ([]*rapb.AddRecordRequest, error) {
-	conn, err := grpc.Dial("discovery:///recordadder", grpc.WithInsecure())
+	conn, err := p.dial(ctx, "recordadder")
 
 	if err != nil {
 		return nil, err
@@ -67,10 +69,12 @@ type rc interface {
 	getRecord(ctx context.Context, id int32) (*rcpb.Record, error)
 }
 
-type prc struct{}
+type prc struct {
+	dial func(ctx context.Context, server string) (*grpc.ClientConn, error)
+}
 
 func (p *prc) getRecordsSince(ctx context.Context, since int64) ([]int32, error) {
-	conn, err := grpc.Dial("discovery:///recordcollection", grpc.WithInsecure())
+	conn, err := p.dial(ctx, "recordcollection")
 
 	if err != nil {
 		return []int32{}, err
@@ -87,7 +91,7 @@ func (p *prc) getRecordsSince(ctx context.Context, since int64) ([]int32, error)
 	return resp.GetInstanceIds(), err
 }
 func (p *prc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, error) {
-	conn, err := grpc.Dial("discovery:///recordcollection", grpc.WithInsecure())
+	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +123,8 @@ func Init() *Server {
 		rc:       &prc{},
 		ra:       &pra{},
 	}
+	s.rc = &prc{dial: s.FDialServer}
+	s.ra = &pra{dial: s.FDialServer}
 	return s
 }
 
