@@ -61,7 +61,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 	prespends.Set(float64(preSpends))
 	alloted.Set(float64(budget))
 
-	return &pb.GetBudgetResponse{Spends: spend, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre}, nil
+	return &pb.GetBudgetResponse{Spends: spend, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre}, s.save(ctx, config)
 }
 
 //ClientUpdate on an updated record
