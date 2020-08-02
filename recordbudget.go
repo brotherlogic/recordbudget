@@ -170,12 +170,23 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{
-		&pbg.State{Key: "purchases", Value: int64(len(s.config.GetPurchases()))},
-		&pbg.State{Key: "pre_purchases", Value: int64(len(s.config.GetPrePurchases()))},
-		&pbg.State{Key: fmt.Sprintf("total_spend_%v", time.Now().Year()), Value: int64(s.getTotalSpend(time.Now().Year()))},
-	}
+	return []*pbg.State{}
 }
+
+var (
+	spends = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_spends",
+		Help: "The amount of potential salve value",
+	})
+	prespends = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_prespends",
+		Help: "The amount of potential salve value",
+	})
+	alloted = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_alloted",
+		Help: "The amount of potential salve value",
+	})
+)
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
@@ -194,6 +205,10 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	ctx, cancel := utils.ManualContext("rb-su", "rb-su", time.Minute, true)
+	server.GetBudget(ctx, &pb.GetBudgetRequest{Year: int32(time.Now().Year())})
+	cancel()
 
 	fmt.Printf("%v", server.Serve())
 }
