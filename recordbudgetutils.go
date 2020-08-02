@@ -68,6 +68,8 @@ func (s *Server) rebuildPreBudget(ctx context.Context, config *pb.Config) (*pb.C
 		return nil, err
 	}
 
+	s.Log(fmt.Sprintf("Got %v adds", len(recs)))
+
 	for _, rec := range recs {
 		found := false
 		for _, pre := range config.GetPrePurchases() {
