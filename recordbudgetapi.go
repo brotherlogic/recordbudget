@@ -54,10 +54,14 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
-	spends, preSpends, ids, pre := s.computeSpends(ctx, config, int(req.GetYear()))
+	spend, preSpends, ids, pre := s.computeSpends(ctx, config, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
 
-	return &pb.GetBudgetResponse{Spends: spends, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre}, nil
+	spends.Set(float64(spend))
+	prespends.Set(float64(preSpends))
+	alloted.Set(float64(budget))
+
+	return &pb.GetBudgetResponse{Spends: spend, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre}, nil
 }
 
 //ClientUpdate on an updated record
