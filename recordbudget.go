@@ -156,6 +156,7 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	if !ok {
 		return nil, fmt.Errorf("Unable to parse config")
 	}
+
 	return config, nil
 }
 
