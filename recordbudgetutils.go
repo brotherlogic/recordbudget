@@ -21,6 +21,10 @@ func (s *Server) adjustDate(r *rcpb.Record) int64 {
 
 func (s *Server) processRec(ctx context.Context, iid int32) error {
 	config, err := s.load(ctx)
+	if err != nil {
+		return err
+	}
+
 	for _, r := range config.GetPurchases() {
 		if r.GetInstanceId() == iid {
 			return nil
