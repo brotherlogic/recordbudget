@@ -187,6 +187,10 @@ var (
 		Name: "recordbudget_alloted",
 		Help: "The amount of potential salve value",
 	})
+	daysToGo = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_daystogo",
+		Help: "The amount of potential salve value",
+	})
 )
 
 func main() {

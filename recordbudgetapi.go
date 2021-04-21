@@ -14,7 +14,7 @@ const (
 	MONTHLYBUDGET = 400
 )
 
-func (s *Server) computeSpends(ctx context.Context, config *pb.Config, year int) (int32, int32, []int32, []int32) {
+func (s *Server) computeSpends(ctx context.Context, config *pb.Config, year int) (int32, int32, []int32, []int32, int32) {
 	resp := []int32{}
 	pre := []int32{}
 	spends := int32(0)
@@ -32,7 +32,9 @@ func (s *Server) computeSpends(ctx context.Context, config *pb.Config, year int)
 		preSpends += prebought.GetCost()
 	}
 
-	return spends, preSpends, resp, pre
+	dtg := preSpends / ((MONTHLYBUDGET * 12) / 365)
+
+	return spends, preSpends, resp, pre, int32(dtg)
 }
 
 func (s *Server) getBudget(ctx context.Context, t time.Time) int32 {
@@ -54,12 +56,13 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
-	spend, preSpends, ids, pre := s.computeSpends(ctx, config, int(req.GetYear()))
+	spend, preSpends, ids, pre, dtg := s.computeSpends(ctx, config, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
 
 	spends.Set(float64(spend))
 	prespends.Set(float64(preSpends))
 	alloted.Set(float64(budget))
+	daysToGo.Set(float64(dtg))
 
 	return &pb.GetBudgetResponse{Spends: spend, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre}, s.save(ctx, config)
 }
