@@ -32,7 +32,7 @@ func (s *Server) computeSpends(ctx context.Context, config *pb.Config, year int)
 		preSpends += prebought.GetCost()
 	}
 
-	dtg := preSpends / ((MONTHLYBUDGET * 12) / 365)
+	dtg := (preSpends / ((MONTHLYBUDGET * 12) / 365)) / 100
 
 	return spends, preSpends, resp, pre, int32(dtg)
 }
