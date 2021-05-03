@@ -14,11 +14,12 @@ const (
 	MONTHLYBUDGET = 400
 )
 
-func (s *Server) computeSpends(ctx context.Context, config *pb.Config, year int) (int32, int32, []int32, []int32, int32) {
+func (s *Server) computeSpends(ctx context.Context, config *pb.Config, year int) (int32, int32, []int32, []int32, int32, int32) {
 	resp := []int32{}
 	pre := []int32{}
 	spends := int32(0)
 	preSpends := int32(0)
+	solds := int32(0)
 	for _, bought := range config.GetPurchases() {
 		date := time.Unix(bought.GetBoughtDate(), 0)
 		if date.Year() == year {
@@ -32,9 +33,16 @@ func (s *Server) computeSpends(ctx context.Context, config *pb.Config, year int)
 		preSpends += prebought.GetCost()
 	}
 
+	for _, sold := range config.GetSolds() {
+		date := time.Unix(sold.GetSoldDate(), 0)
+		if date.Year() == year {
+			solds += sold.GetPrice()
+		}
+	}
+
 	dtg := (preSpends / ((MONTHLYBUDGET * 12) / 365)) / 100
 
-	return spends, preSpends, resp, pre, int32(dtg)
+	return spends, preSpends, resp, pre, solds, int32(dtg)
 }
 
 func (s *Server) getBudget(ctx context.Context, t time.Time) int32 {
@@ -56,15 +64,16 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
-	spend, preSpends, ids, pre, dtg := s.computeSpends(ctx, config, int(req.GetYear()))
+	spend, preSpends, ids, pre, slds, dtg := s.computeSpends(ctx, config, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
 
 	spends.Set(float64(spend))
 	prespends.Set(float64(preSpends))
 	alloted.Set(float64(budget))
 	daysToGo.Set(float64(dtg))
+	solds.Set(float64(slds))
 
-	return &pb.GetBudgetResponse{Spends: spend, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre}, s.save(ctx, config)
+	return &pb.GetBudgetResponse{Spends: spend, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre, Solds: slds}, s.save(ctx, config)
 }
 
 //ClientUpdate on an updated record

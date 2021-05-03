@@ -8,6 +8,7 @@ import (
 
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
+	pbrs "github.com/brotherlogic/recordscores/proto"
 )
 
 func (s *Server) adjustDate(r *rcpb.Record) int64 {
@@ -25,8 +26,8 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 
-	for _, r := range config.GetPurchases() {
-		if r.GetInstanceId() == iid {
+	for _, re := range config.GetSolds() {
+		if re.GetInstanceId() == iid {
 			return nil
 		}
 	}
@@ -34,6 +35,37 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	r, err := s.rc.getRecord(ctx, iid)
 	if err != nil {
 		return err
+	}
+
+	if r.GetMetadata().GetCategory() == rcpb.ReleaseMetadata_SOLD_ARCHIVE {
+		conn, err := s.FDialServer(ctx, "recordscores")
+		if err != nil {
+			return err
+		}
+		rss := pbrs.NewRecordScoreServiceClient(conn)
+		scores, err := rss.GetScore(ctx, &pbrs.GetScoreRequest{InstanceId: iid})
+		if err != nil {
+			return err
+		}
+
+		for _, score := range scores.GetScores() {
+			if score.GetCategory() == rcpb.ReleaseMetadata_SOLD_ARCHIVE {
+				config.Solds = append(config.Solds,
+					&pb.SoldRecord{
+						InstanceId: iid,
+						Price:      r.GetMetadata().GetSalePrice(),
+						SoldDate:   score.GetScoreTime(),
+					})
+				return s.save(ctx, config)
+			}
+		}
+
+	}
+
+	for _, re := range config.GetPurchases() {
+		if re.GetInstanceId() == iid {
+			return nil
+		}
 	}
 
 	dateAdded := s.adjustDate(r)
