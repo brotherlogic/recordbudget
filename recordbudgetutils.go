@@ -42,6 +42,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		if err != nil {
 			return err
 		}
+		defer conn.Close()
 		rss := pbrs.NewRecordScoreServiceClient(conn)
 		scores, err := rss.GetScore(ctx, &pbrs.GetScoreRequest{InstanceId: iid})
 		if err != nil {
