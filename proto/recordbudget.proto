@@ -9,6 +9,15 @@ message Config {
   repeated BoughtRecord purchases = 2;
   repeated PreBoughtRecord pre_purchases = 3;
   repeated SoldRecord solds = 4;
+
+  int64 last_order_pull = 6;
+  repeated Order orders = 5;
+}
+
+message Order {
+  string order_id = 1;
+  repeated int32 listing_id = 2;
+  int64 sale_date = 3;
 }
 
 message BoughtRecord {
