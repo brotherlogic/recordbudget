@@ -67,6 +67,7 @@ func (p *pra) getAdds(ctx context.Context) ([]*rapb.AddRecordRequest, error) {
 type rc interface {
 	getRecordsSince(ctx context.Context, timeFrom int64) ([]int32, error)
 	getRecord(ctx context.Context, id int32) (*rcpb.Record, error)
+	getOrder(ctx context.Context, id int32) (*rcpb.GetOrderResponse, error)
 }
 
 type prc struct {
@@ -105,6 +106,17 @@ func (p *prc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, er
 	}
 
 	return resp.GetRecord(), err
+}
+
+func (p *prc) getOrder(ctx context.Context, ID int32) (*rcpb.GetOrderResponse, error) {
+	conn, err := p.dial(ctx, "recordcollection")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	return client.GetOrder(ctx, &rcpb.GetOrderRequest{Id: fmt.Sprintf("150295-%v", ID)})
 }
 
 //Server main server type

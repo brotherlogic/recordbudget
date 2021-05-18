@@ -29,6 +29,21 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 
 	config.LastOrderPullDate = time.Now().Unix()
 
+	order, err := s.rc.getOrder(ctx, config.LastOrderPull)
+	if err != nil {
+		return nil, err
+	}
+
+	for id, price := range order.GetListingToPrice() {
+		config.Orders = append(config.Orders, &pb.Order{
+			OrderId:   fmt.Sprintf("152095-%v", config.LastOrderPull),
+			SaleDate:  order.GetSaleDate(),
+			ListingId: id,
+			SalePrice: price,
+		})
+	}
+	config.LastOrderPull++
+
 	return config, nil
 }
 
@@ -50,6 +65,11 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	r, err := s.rc.getRecord(ctx, iid)
 	if err != nil {
 		return err
+	}
+
+	// See if we've got an confirmed order for this
+	if r.GetMetadata().GetSoldDate() == 0 && r.GetMetadata().GetSaleId() > 0 {
+
 	}
 
 	for _, re := range config.GetSolds() {

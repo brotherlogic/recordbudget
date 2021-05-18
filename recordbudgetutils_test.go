@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brotherlogic/keystore/client"
+	keystoreclient "github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 
 	gdpb "github.com/brotherlogic/godiscogs"
@@ -42,6 +42,10 @@ func (t *trc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, er
 		return nil, fmt.Errorf("Built to fail")
 	}
 	return &rcpb.Record{Release: &gdpb.Release{Id: 12}}, nil
+}
+
+func (t *trc) getOrder(ctx context.Context, ID int32) (*rcpb.GetOrderResponse, error) {
+	return nil, fmt.Errorf("Not implemented")
 }
 
 func InitTestServer() *Server {

@@ -17,8 +17,9 @@ message Config {
 
 message Order {
   string order_id = 1;
-  repeated int32 listing_id = 2;
+   int32 listing_id = 2;
   int64 sale_date = 3;
+  int32 sale_price = 4;
 }
 
 message BoughtRecord {
