@@ -20,10 +20,26 @@ func (s *Server) adjustDate(r *rcpb.Record) int64 {
 	return dateAdded.Unix()
 }
 
+func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config, error) {
+
+	config.LastOrderPullDate = time.Now().Unix()
+
+	return config, nil
+}
+
 func (s *Server) processRec(ctx context.Context, iid int32) error {
 	config, err := s.load(ctx)
 	if err != nil {
 		return err
+	}
+
+	if time.Now().Sub(time.Unix(config.GetLastOrderPullDate(), 0)) > time.Hour {
+		config, err := s.pullOrders(ctx, config)
+		if err != nil {
+			return err
+		}
+
+		s.save(ctx, config)
 	}
 
 	r, err := s.rc.getRecord(ctx, iid)
