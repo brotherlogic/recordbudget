@@ -10,8 +10,9 @@ message Config {
   repeated PreBoughtRecord pre_purchases = 3;
   repeated SoldRecord solds = 4;
 
-  int64 last_order_pull = 6;
+  int32 last_order_pull = 6;
   repeated Order orders = 5;
+  int64 last_order_pull_date = 7;
 }
 
 message Order {

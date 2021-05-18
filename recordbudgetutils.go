@@ -56,12 +56,21 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 
 		for _, score := range scores.GetScores() {
 			if score.GetCategory() == rcpb.ReleaseMetadata_SOLD_ARCHIVE {
-				config.Solds = append(config.Solds,
-					&pb.SoldRecord{
-						InstanceId: iid,
-						Price:      r.GetMetadata().GetSalePrice(),
-						SoldDate:   score.GetScoreTime(),
-					})
+				if r.GetMetadata().GetSoldPrice() > 0 {
+					config.Solds = append(config.Solds,
+						&pb.SoldRecord{
+							InstanceId: iid,
+							Price:      r.GetMetadata().GetSoldPrice(),
+							SoldDate:   r.GetMetadata().GetSoldDate(),
+						})
+				} else {
+					config.Solds = append(config.Solds,
+						&pb.SoldRecord{
+							InstanceId: iid,
+							Price:      r.GetMetadata().GetSalePrice(),
+							SoldDate:   score.GetScoreTime(),
+						})
+				}
 				return s.save(ctx, config)
 			}
 		}

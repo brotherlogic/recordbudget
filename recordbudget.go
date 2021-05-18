@@ -195,6 +195,14 @@ var (
 		Name: "recordbudget_solds",
 		Help: "Value of sales",
 	})
+	lastOrderDate = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_last_order_date",
+		Help: "Value of sales",
+	})
+	lastOrderNumber = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "recordbudget_last_order_number",
+		Help: "Value of sales",
+	}, []string{"response"})
 )
 
 func main() {
