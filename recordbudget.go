@@ -157,6 +157,8 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 		return nil, fmt.Errorf("Unable to parse config")
 	}
 
+	lastOrderDate.Set(float64(config.GetLastOrderPullDate()))
+
 	return config, nil
 }
 
