@@ -26,15 +26,20 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 
-	for _, re := range config.GetSolds() {
-		if re.GetInstanceId() == iid {
-			return nil
-		}
-	}
-
 	r, err := s.rc.getRecord(ctx, iid)
 	if err != nil {
 		return err
+	}
+
+	for _, re := range config.GetSolds() {
+		if re.GetInstanceId() == iid {
+			if r.GetMetadata().GetSoldPrice() > 0 {
+				re.Price = r.GetMetadata().GetSoldPrice()
+				re.SoldDate = r.GetMetadata().GetSoldDate()
+				return s.save(ctx, config)
+			}
+			return nil
+		}
 	}
 
 	if r.GetMetadata().GetCategory() == rcpb.ReleaseMetadata_SOLD_ARCHIVE {
