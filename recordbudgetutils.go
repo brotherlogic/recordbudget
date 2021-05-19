@@ -55,7 +55,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 
-	if time.Now().Sub(time.Unix(config.GetLastOrderPullDate(), 0)) > time.Hour {
+	if time.Now().Sub(time.Unix(config.GetLastOrderPullDate(), 0)) > time.Minute {
 		config, err := s.pullOrders(ctx, config)
 		if err != nil {
 			return err
