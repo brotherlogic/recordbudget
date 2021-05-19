@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/resolver"
 
+	gdpb "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
 	rapb "github.com/brotherlogic/recordadder/proto"
 	pb "github.com/brotherlogic/recordbudget/proto"
@@ -68,6 +69,7 @@ type rc interface {
 	getRecordsSince(ctx context.Context, timeFrom int64) ([]int32, error)
 	getRecord(ctx context.Context, id int32) (*rcpb.Record, error)
 	getOrder(ctx context.Context, id int32) (*rcpb.GetOrderResponse, error)
+	updateRecord(ctx context.Context, iid int32, order *pb.Order) error
 }
 
 type prc struct {
@@ -117,6 +119,20 @@ func (p *prc) getOrder(ctx context.Context, ID int32) (*rcpb.GetOrderResponse, e
 
 	client := rcpb.NewRecordCollectionServiceClient(conn)
 	return client.GetOrder(ctx, &rcpb.GetOrderRequest{Id: fmt.Sprintf("150295-%v", ID)})
+}
+
+func (p *prc) updateRecord(ctx context.Context, iid int32, order *pb.Order) error {
+	conn, err := p.dial(ctx, "recordcollection")
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	client := rcpb.NewRecordCollectionServiceClient(conn)
+	_, err = client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Update: &rcpb.Record{
+		Release:  &gdpb.Release{InstanceId: iid},
+		Metadata: &rcpb.ReleaseMetadata{SoldDate: order.GetSaleDate(), SoldPrice: order.GetSalePrice()}}})
+	return err
 }
 
 //Server main server type

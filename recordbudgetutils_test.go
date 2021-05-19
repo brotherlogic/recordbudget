@@ -48,6 +48,10 @@ func (t *trc) getOrder(ctx context.Context, ID int32) (*rcpb.GetOrderResponse, e
 	return nil, fmt.Errorf("Not implemented")
 }
 
+func (t *trc) updateRecord(ctx context.Context, iid int32, order *pb.Order) error {
+	return nil
+}
+
 func InitTestServer() *Server {
 	s := Init()
 	s.rc = &trc{}
