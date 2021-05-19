@@ -9,6 +9,7 @@ import (
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbrs "github.com/brotherlogic/recordscores/proto"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func (s *Server) adjustDate(r *rcpb.Record) int64 {
@@ -30,6 +31,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	config.LastOrderPullDate = time.Now().Unix()
 
 	order, err := s.rc.getOrder(ctx, config.LastOrderPull)
+	lastOrderNumber.With(prometheus.Labels{"response": fmt.Sprintf("%v", err)})
 	if err != nil {
 		return nil, err
 	}
