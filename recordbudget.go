@@ -170,6 +170,7 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	}
 
 	lastOrderDate.Set(float64(config.GetLastOrderPullDate()))
+	orderCount.Set(float64(len(config.Orders)))
 
 	return config, nil
 }
@@ -207,6 +208,10 @@ var (
 	})
 	solds = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "recordbudget_solds",
+		Help: "Value of sales",
+	})
+	orderCount = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_ordercount",
 		Help: "Value of sales",
 	})
 	lastOrderDate = promauto.NewGauge(prometheus.GaugeOpts{
