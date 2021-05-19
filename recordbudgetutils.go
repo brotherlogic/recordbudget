@@ -31,7 +31,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	config.LastOrderPullDate = time.Now().Unix()
 
 	order, err := s.rc.getOrder(ctx, config.LastOrderPull)
-	lastOrderNumber.With(prometheus.Labels{"response": fmt.Sprintf("%v", err)})
+	lastOrderNumber.With(prometheus.Labels{"response": fmt.Sprintf("%v", err)}).Set(float64(config.LastOrderPull))
 	if err != nil {
 		return nil, err
 	}
