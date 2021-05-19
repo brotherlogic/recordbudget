@@ -3,7 +3,7 @@ module github.com/brotherlogic/recordbudget
 go 1.13
 
 require (
-	github.com/brotherlogic/buildserver v0.0.0-20210519000417-446597755f53 // indirect
+	github.com/brotherlogic/buildserver v0.0.0-20210519002838-c00ec3ada22f // indirect
 	github.com/brotherlogic/godiscogs v0.0.0-20210518152717-7640a716f4bd
 	github.com/brotherlogic/goserver v0.0.0-20210517140105-372f30a83363
 	github.com/brotherlogic/keystore v0.0.0-20201029130503-da423c07fd79

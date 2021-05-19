@@ -30,6 +30,8 @@ github.com/brotherlogic/buildserver v0.0.0-20210311141809-ebce0d8f1d09 h1:w9s+rc
 github.com/brotherlogic/buildserver v0.0.0-20210311141809-ebce0d8f1d09/go.mod h1:ZAwx2ZhsKIo+MaMpoN7T8d3dgHO8mjCFDPB4wMBIFlE=
 github.com/brotherlogic/buildserver v0.0.0-20210519000417-446597755f53 h1:gUgGv4cuIIHFP0aVWAWYh7v/JfiXRH6sNCNFapFZPH0=
 github.com/brotherlogic/buildserver v0.0.0-20210519000417-446597755f53/go.mod h1:ZAwx2ZhsKIo+MaMpoN7T8d3dgHO8mjCFDPB4wMBIFlE=
+github.com/brotherlogic/buildserver v0.0.0-20210519002838-c00ec3ada22f h1:zE2FqfF+LMMjVanSet//zFgPWUT/4CT37OXstoDbsck=
+github.com/brotherlogic/buildserver v0.0.0-20210519002838-c00ec3ada22f/go.mod h1:rzEZMZKU1M/DuAyhVtsA2c/xn9CBumD34dy86hnx35g=
 github.com/brotherlogic/cardserver v0.0.0-20190719223243-651f4429cf27/go.mod h1:kP95c+Z9HoDZogqHo6tnAUdvW5YnTSV+MQOPxlLPszk=
 github.com/brotherlogic/datastore v0.0.0-20201116152557-1a9915463b93 h1:Ayr6KHgogmanBE4johD4diF12aKgiZO7qxOguBXg0uw=
 github.com/brotherlogic/datastore v0.0.0-20201116152557-1a9915463b93/go.mod h1:/DjZqh1UjmtJTw0NZuZRH6PDLEzk2xtFXARQaBMrepk=

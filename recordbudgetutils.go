@@ -23,7 +23,7 @@ func (s *Server) adjustDate(r *rcpb.Record) int64 {
 
 func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config, error) {
 
-	// Order numbers start at zero
+	// Order numbers start at zero, so adjust
 	if config.LastOrderPull == 0 {
 		config.LastOrderPull = 1
 	}
