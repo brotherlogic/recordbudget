@@ -239,6 +239,10 @@ var (
 		Name: "recordbudget_last_order_number",
 		Help: "Value of sales",
 	}, []string{"response"})
+	lastListing = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_last_listing",
+		Help: "Value of sales",
+	})
 )
 
 func main() {

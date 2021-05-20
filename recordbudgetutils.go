@@ -43,6 +43,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 			ListingId: id,
 			SalePrice: price,
 		})
+		lastListing.Set(float64(id))
 	}
 	config.LastOrderPull++
 
