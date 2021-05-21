@@ -27,6 +27,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	if config.LastOrderPull == 0 {
 		config.LastOrderPull = 1
 	}
+	s.Log(fmt.Sprintf("Adjusted to %v", config.LastOrderPull))
 
 	config.LastOrderPullDate = time.Now().Unix()
 
