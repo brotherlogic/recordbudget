@@ -16,7 +16,7 @@ func (s *Server) adjustDate(r *rcpb.Record) int64 {
 	dateAdded := time.Unix(r.GetMetadata().GetDateAdded(), 0)
 	if r.GetMetadata().GetAccountingYear() > 0 {
 		dateAdded = dateAdded.AddDate(int(r.GetMetadata().GetAccountingYear())-dateAdded.Year(), 0, 0)
-		s.Log(fmt.Sprintf("Adjust %v to %v", r.GetRelease().GetTitle(), dateAdded))
+		s.Log(fmt.Sprintf("Adjusting %v to %v", r.GetRelease().GetTitle(), dateAdded))
 	}
 	return dateAdded.Unix()
 }
