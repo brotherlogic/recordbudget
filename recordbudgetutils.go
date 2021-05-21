@@ -71,6 +71,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	// See if we've got an confirmed order for this
+	s.Log(fmt.Sprintf("Trying %v and %v", r.GetMetadata().GetSoldDate(), r.GetMetadata().GetSaleId()))
 	if r.GetMetadata().GetSoldDate() == 0 && r.GetMetadata().GetSaleId() > 0 {
 		for _, order := range config.GetOrders() {
 			if order.GetListingId() == r.GetMetadata().GetSaleId() {
