@@ -18,6 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RecordBudgetServiceClient interface {
 	GetBudget(ctx context.Context, in *GetBudgetRequest, opts ...grpc.CallOption) (*GetBudgetResponse, error)
+	GetSold(ctx context.Context, in *GetSoldRequest, opts ...grpc.CallOption) (*GetSoldResponse, error)
 }
 
 type recordBudgetServiceClient struct {
@@ -37,11 +38,21 @@ func (c *recordBudgetServiceClient) GetBudget(ctx context.Context, in *GetBudget
 	return out, nil
 }
 
+func (c *recordBudgetServiceClient) GetSold(ctx context.Context, in *GetSoldRequest, opts ...grpc.CallOption) (*GetSoldResponse, error) {
+	out := new(GetSoldResponse)
+	err := c.cc.Invoke(ctx, "/recordbudget.RecordBudgetService/GetSold", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RecordBudgetServiceServer is the server API for RecordBudgetService service.
 // All implementations should embed UnimplementedRecordBudgetServiceServer
 // for forward compatibility
 type RecordBudgetServiceServer interface {
 	GetBudget(context.Context, *GetBudgetRequest) (*GetBudgetResponse, error)
+	GetSold(context.Context, *GetSoldRequest) (*GetSoldResponse, error)
 }
 
 // UnimplementedRecordBudgetServiceServer should be embedded to have forward compatible implementations.
@@ -50,6 +61,9 @@ type UnimplementedRecordBudgetServiceServer struct {
 
 func (UnimplementedRecordBudgetServiceServer) GetBudget(context.Context, *GetBudgetRequest) (*GetBudgetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBudget not implemented")
+}
+func (UnimplementedRecordBudgetServiceServer) GetSold(context.Context, *GetSoldRequest) (*GetSoldResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSold not implemented")
 }
 
 // UnsafeRecordBudgetServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -81,6 +95,24 @@ func _RecordBudgetService_GetBudget_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RecordBudgetService_GetSold_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSoldRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RecordBudgetServiceServer).GetSold(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/recordbudget.RecordBudgetService/GetSold",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RecordBudgetServiceServer).GetSold(ctx, req.(*GetSoldRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _RecordBudgetService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "recordbudget.RecordBudgetService",
 	HandlerType: (*RecordBudgetServiceServer)(nil),
@@ -88,6 +120,10 @@ var _RecordBudgetService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBudget",
 			Handler:    _RecordBudgetService_GetBudget_Handler,
+		},
+		{
+			MethodName: "GetSold",
+			Handler:    _RecordBudgetService_GetSold_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

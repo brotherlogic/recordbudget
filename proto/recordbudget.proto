@@ -52,6 +52,15 @@ message GetBudgetResponse {
   repeated int32 pre_purchased_ids = 4;
 }
 
+message GetSoldRequest{
+  int32 instance_id = 1;
+}
+
+message GetSoldResponse {
+  SoldRecord record = 1;
+}
+
 service RecordBudgetService {
   rpc GetBudget(GetBudgetRequest) returns (GetBudgetResponse) {};
+  rpc GetSold(GetSoldRequest) returns (GetSoldResponse) {};
 }

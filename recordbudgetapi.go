@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
@@ -79,4 +81,19 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 //ClientUpdate on an updated record
 func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest) (*rcpb.ClientUpdateResponse, error) {
 	return &rcpb.ClientUpdateResponse{}, s.processRec(ctx, req.GetInstanceId())
+}
+
+func (s *Server) GetSold(ctx context.Context, req *pb.GetSoldRequest) (*pb.GetSoldResponse, error) {
+	config, err := s.load(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, sold := range config.GetSolds() {
+		if sold.GetInstanceId() == req.GetInstanceId() {
+			return &pb.GetSoldResponse{Record: sold}, nil
+		}
+	}
+
+	return nil, status.Errorf(codes.NotFound, "Unable to locate %v", req.GetInstanceId())
 }
