@@ -76,11 +76,10 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	if r.GetMetadata().GetSoldDate() == 0 && r.GetMetadata().GetSaleId() > 0 {
 		for _, order := range config.GetOrders() {
 			if order.GetListingId() == r.GetMetadata().GetSaleId() {
-				return fmt.Errorf("Found match on %v -> %v", iid, order)
-				/*err := s.rc.updateRecord(ctx, iid, order)
+				err := s.rc.updateRecord(ctx, iid, order)
 				if err != nil {
 					return err
-				}*/
+				}
 			}
 		}
 	}
