@@ -130,7 +130,7 @@ func (p *prc) updateRecord(ctx context.Context, iid int32, order *pb.Order) erro
 
 	client := rcpb.NewRecordCollectionServiceClient(conn)
 
-	_, err = client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Update: &rcpb.Record{
+	_, err = client.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Reason: "sale update", Update: &rcpb.Record{
 		Release:  &gdpb.Release{InstanceId: iid},
 		Metadata: &rcpb.ReleaseMetadata{SoldDate: order.GetSaleDate(), SoldPrice: order.GetSalePrice()}}})
 	return err
