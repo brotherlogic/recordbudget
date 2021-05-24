@@ -38,7 +38,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	lastOrderNumber.With(prometheus.Labels{"response": fmt.Sprintf("%v", err)}).Set(float64(config.LastOrderPull))
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
-			//Just silently ignore this - and keep trying
+			//Just silently ignore this - and keep moving
 			return config, nil
 		}
 
