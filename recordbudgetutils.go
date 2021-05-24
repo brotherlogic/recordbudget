@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
@@ -35,6 +37,11 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	order, err := s.rc.getOrder(ctx, config.LastOrderPull)
 	lastOrderNumber.With(prometheus.Labels{"response": fmt.Sprintf("%v", err)}).Set(float64(config.LastOrderPull))
 	if err != nil {
+		if status.Convert(err).Code() == codes.FailedPrecondition {
+			//Just silently ignore this - and keep trying
+			return config, nil
+		}
+
 		return nil, err
 	}
 
@@ -58,7 +65,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 
-	if time.Now().Sub(time.Unix(config.GetLastOrderPullDate(), 0)) > time.Minute {
+	if time.Now().Sub(time.Unix(config.GetLastOrderPullDate(), 0)) > time.Hour {
 		config, err := s.pullOrders(ctx, config)
 		if err != nil {
 			return err
