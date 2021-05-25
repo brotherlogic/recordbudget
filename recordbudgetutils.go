@@ -70,7 +70,6 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		if err != nil {
 			return err
 		}
-
 		s.save(ctx, config)
 	}
 
