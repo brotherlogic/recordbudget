@@ -24,7 +24,7 @@ func (s *Server) adjustDate(r *rcpb.Record) int64 {
 }
 
 func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config, error) {
-	s.Log(fmt.Sprintf("Pulling orders from %v", config.LastOrderPull))
+	s.Log(fmt.Sprintf("Pulling orders from this time %v", config.LastOrderPull))
 
 	// Order numbers start at zero, so adjust
 	if config.LastOrderPull == 0 {
