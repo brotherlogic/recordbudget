@@ -90,7 +90,9 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 				}
 			}
 		}
-		s.RaiseIssue("Difficult Sale", fmt.Sprintf("%v has a sale id but no related order", iid))
+		if r.GetMetadata().GetCategory() == rcpb.ReleaseMetadata_SOLD_ARCHIVE {
+			s.RaiseIssue("Difficult Sale", fmt.Sprintf("%v has a sale id but no related order", iid))
+		}
 	}
 
 	for _, re := range config.GetSolds() {
