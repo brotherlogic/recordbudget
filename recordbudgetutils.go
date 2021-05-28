@@ -92,7 +92,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		}
 
 		if r.GetMetadata().GetCategory() == rcpb.ReleaseMetadata_SOLD_ARCHIVE {
-			s.RaiseIssue("Difficult Sale", fmt.Sprintf("%v has a sale id but no related order", iid))
+			s.RaiseIssue(fmt.Sprintf("Difficult Sale for %v", iid), fmt.Sprintf("%v has a sale id but no related order - see https://www.discogs.com/madeup/release/%v", iid, r.GetRelease().GetId()))
 		}
 	}
 
