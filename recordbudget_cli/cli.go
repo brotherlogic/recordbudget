@@ -65,8 +65,9 @@ func main() {
 			log.Fatalf("Error getting budget: %v", err)
 		}
 		fmt.Printf("Spend: %v\n", res.GetSpends())
-		fmt.Printf("PreSpend: %v", res.GetPreSpends())
+		fmt.Printf("PreSpend: %v\n", res.GetPreSpends())
 		fmt.Printf("Sold: %v\n", res.GetSolds())
+		fmt.Printf("Budget: %v\n", res.GetBudget())
 		fmt.Println("-------------")
 		fmt.Printf("Budget: %v", res.GetBudget()-res.GetSpends()-res.GetPreSpends()+res.GetSolds())
 	}
