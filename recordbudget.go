@@ -263,7 +263,7 @@ func main() {
 		return
 	}
 
-	ctx, cancel := utils.ManualContext("rb-su", "rb-su", time.Minute, true)
+	ctx, cancel := utils.ManualContext("rb-su", time.Minute)
 	server.GetBudget(ctx, &pb.GetBudgetRequest{Year: int32(time.Now().Year())})
 	cancel()
 
