@@ -69,6 +69,6 @@ func main() {
 		fmt.Printf("Sold: %v\n", res.GetSolds())
 		fmt.Printf("Budget: %v\n", res.GetBudget())
 		fmt.Println("-------------")
-		fmt.Printf("Budget: %v", res.GetBudget()-res.GetSpends()-res.GetPreSpends()+res.GetSolds())
+		fmt.Printf("Budget: %v\n", res.GetBudget()+res.GetSolds()-res.GetSpends()-res.GetPreSpends())
 	}
 }
