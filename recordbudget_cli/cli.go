@@ -64,11 +64,11 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error getting budget: %v", err)
 		}
-		fmt.Printf("Spend: %v\n", res.GetSpends())
-		fmt.Printf("PreSpend: %v\n", res.GetPreSpends())
-		fmt.Printf("Sold: %v\n", res.GetSolds())
-		fmt.Printf("Budget: %v\n", res.GetBudget())
+		fmt.Printf("Spend: $%v\n", res.GetSpends()/100.0)
+		fmt.Printf("PreSpend: $%v\n", res.GetPreSpends()/100.0)
+		fmt.Printf("Sold: $%v\n", res.GetSolds()/100.0)
+		fmt.Printf("Budget: $%v\n", res.GetBudget()/100.0)
 		fmt.Println("-------------")
-		fmt.Printf("Budget: %v\n", res.GetBudget()+res.GetSolds()-res.GetSpends()-res.GetPreSpends())
+		fmt.Printf("Budget: $%v\n", (res.GetBudget()+res.GetSolds()-res.GetSpends()-res.GetPreSpends())/100.0)
 	}
 }
