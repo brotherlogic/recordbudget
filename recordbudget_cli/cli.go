@@ -64,16 +64,10 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error getting budget: %v", err)
 		}
-		fmt.Printf("You have %v remaining in your budget, You've spent %v (%v) so far this year and have %v (%v) to come\n", res.GetBudget()-res.GetSpends(), res.GetSpends(), res.GetBudget(), res.GetPreSpends(), res.GetBudget()-res.GetSpends()-res.GetPreSpends())
-		for _, p := range res.GetPurchasedIds() {
-			cost, r := getRecord(p)
-			if cost > 1 {
-				fmt.Printf("Purchase: [%v] - %v\n", p, r)
-			}
-		}
-
-		for _, p := range res.GetPrePurchasedIds() {
-			fmt.Printf("PrePurchase: %v\n", p)
-		}
+		fmt.Printf("Spend: %v\n", res.GetSpends())
+		fmt.Printf("PreSpend: %v", res.GetPreSpends())
+		fmt.Printf("Sold: %v\n", res.GetSolds())
+		fmt.Println("-------------")
+		fmt.Printf("Budget: %v", res.GetBudget()-res.GetSpends()-res.GetPreSpends()+res.GetSolds())
 	}
 }
