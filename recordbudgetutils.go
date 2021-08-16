@@ -184,6 +184,7 @@ func (s *Server) rebuildPreBudget(ctx context.Context, config *pb.Config) (*pb.C
 		return nil, err
 	}
 
+	config.PrePurchases = make([]*pb.PreBoughtRecord, 0)
 	for _, rec := range recs {
 		found := false
 		for _, pre := range config.GetPrePurchases() {

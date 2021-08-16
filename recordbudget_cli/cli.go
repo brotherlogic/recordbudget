@@ -70,5 +70,15 @@ func main() {
 		fmt.Printf("Budget: $%v\n", res.GetBudget()/100.0)
 		fmt.Println("-------------")
 		fmt.Printf("Budget: $%v\n", (res.GetBudget()+res.GetSolds()-res.GetSpends()-res.GetPreSpends())/100.0)
+	case "ping":
+		soldFlags := flag.NewFlagSet("sold", flag.ExitOnError)
+		var id = soldFlags.Int("id", -1, "Id of the record to add")
+		if err := soldFlags.Parse(os.Args[2:]); err == nil {
+			c2 := rcpb.NewClientUpdateServiceClient(conn)
+			_, err := c2.ClientUpdate(ctx, &rcpb.ClientUpdateRequest{InstanceId: int32(*id)})
+			if err != nil {
+				log.Fatalf("Error getting budget: %v", err)
+			}
+		}
 	}
 }
