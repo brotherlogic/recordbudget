@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/net/context"
@@ -68,6 +69,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 
 	spend, preSpends, ids, pre, slds, dtg := s.computeSpends(ctx, config, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
+	s.Log(fmt.Sprintf("%v", config.PrePurchases))
 
 	spends.Set(float64(spend))
 	prespends.Set(float64(preSpends))
