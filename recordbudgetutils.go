@@ -75,6 +75,17 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 
 	r, err := s.rc.getRecord(ctx, iid)
 	if err != nil {
+		if status.Convert(err).Code() == codes.OutOfRange {
+			pc := make([]*pb.BoughtRecord, 0)
+			for _, b := range config.GetPurchases() {
+				if b.GetInstanceId() != iid {
+					pc = append(pc, b)
+				}
+			}
+			config.Purchases = pc
+			return s.save(ctx, config)
+		}
+
 		return err
 	}
 

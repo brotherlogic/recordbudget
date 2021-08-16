@@ -70,6 +70,20 @@ func main() {
 		fmt.Printf("Budget: $%v\n", res.GetBudget()/100.0)
 		fmt.Println("-------------")
 		fmt.Printf("Budget: $%v\n", (res.GetBudget()+res.GetSolds()-res.GetSpends()-res.GetPreSpends())/100.0)
+		fmt.Printf("Purchases: %v\n", len(res.GetPurchasedIds()))
+	case "refresh":
+		res, err := client.GetBudget(ctx, &pb.GetBudgetRequest{Year: int32(time.Now().Year())})
+		if err != nil {
+			log.Fatalf("Error getting budget: %v", err)
+		}
+		c2 := rcpb.NewClientUpdateServiceClient(conn)
+		for _, id := range res.GetPurchasedIds() {
+			_, err := c2.ClientUpdate(ctx, &rcpb.ClientUpdateRequest{InstanceId: id})
+			fmt.Printf("Ran %v -> %v\n", id, err)
+			if err != nil {
+				log.Fatalf("Can't process this one")
+			}
+		}
 	case "ping":
 		soldFlags := flag.NewFlagSet("sold", flag.ExitOnError)
 		var id = soldFlags.Int("id", -1, "Id of the record to add")
