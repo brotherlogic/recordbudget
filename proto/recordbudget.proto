@@ -13,7 +13,24 @@ message Config {
   int32 last_order_pull = 6;
   repeated Order orders = 5;
   int64 last_order_pull_date = 7;
+
+  repeated Budget budgets = 8;
 }
+
+  enum BudgetType {
+    YEARLY = 0;
+    QUARTERLY = 2;
+    INFINITE = 3;
+  }
+
+message Budget {
+  string name = 1;
+
+  BudgetType type = 2;
+
+  map<int64, int32> seeds = 3;
+}
+
 
 message Order {
   string order_id = 1;
@@ -26,6 +43,7 @@ message BoughtRecord {
   int32 instance_id = 1;
   int32 cost = 2;
   int64 bought_date = 3;
+  string budget = 4;
 }
 
 message PreBoughtRecord {
@@ -41,6 +59,11 @@ message SoldRecord {
 
 message GetBudgetRequest {
   int32 year = 1;
+  string budget = 2;
+}
+
+message Records {
+  repeated BoughtRecord records = 1;
 }
 
 message GetBudgetResponse {
@@ -50,6 +73,10 @@ message GetBudgetResponse {
   int32 budget = 2;
   repeated int32 purchased_ids = 3;
   repeated int32 pre_purchased_ids = 4;
+
+  map<string, Records> budget_state = 7;
+
+  Budget chosen_budget = 8;
 }
 
 message GetSoldRequest{
@@ -60,7 +87,26 @@ message GetSoldResponse {
   SoldRecord record = 1;
 }
 
+message AddBudgetRequest {
+  string name = 1;
+  BudgetType type = 2;
+}
+
+message AddBudgetResponse {}
+
+message SeedBudgetRequest {
+  string name = 1;
+  int64 timestamp = 2;
+  int32 amount = 3;
+}
+
+message SeedBudgetResponse {
+
+}
+
 service RecordBudgetService {
+  rpc AddBudget(AddBudgetRequest) returns (AddBudgetResponse) {};
+  rpc SeedBudget(SeedBudgetRequest) returns (SeedBudgetResponse) {};
   rpc GetBudget(GetBudgetRequest) returns (GetBudgetResponse) {};
   rpc GetSold(GetSoldRequest) returns (GetSoldResponse) {};
 }

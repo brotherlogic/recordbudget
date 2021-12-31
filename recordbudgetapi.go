@@ -99,3 +99,39 @@ func (s *Server) GetSold(ctx context.Context, req *pb.GetSoldRequest) (*pb.GetSo
 
 	return nil, status.Errorf(codes.NotFound, "Unable to locate %v", req.GetInstanceId())
 }
+
+func (s *Server) AddBudget(ctx context.Context, req *pb.AddBudgetRequest) (*pb.AddBudgetResponse, error) {
+	config, err := s.load(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, budget := range config.GetBudgets() {
+		if budget.GetName() == req.GetName() {
+			return nil, status.Errorf(codes.AlreadyExists, "%v already exists", req.GetName())
+		}
+	}
+
+	config.Budgets = append(config.Budgets, &pb.Budget{
+		Name: req.GetName(),
+		Type: req.GetType(),
+	})
+
+	return &pb.AddBudgetResponse{}, s.save(ctx, config)
+}
+
+func (s Server) SeedBudget(ctx context.Context, req *pb.SeedBudgetRequest) (*pb.SeedBudgetResponse, error) {
+	config, err := s.load(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, budget := range config.GetBudgets() {
+		if budget.GetName() == req.GetName() {
+			budget.Seeds[req.GetTimestamp()] = req.GetAmount()
+			return &pb.SeedBudgetResponse{}, s.save(ctx, config)
+		}
+	}
+
+	return nil, status.Errorf(codes.FailedPrecondition, "%v is not a valid budget", req.GetName())
+}

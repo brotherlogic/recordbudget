@@ -17,6 +17,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RecordBudgetServiceClient interface {
+	AddBudget(ctx context.Context, in *AddBudgetRequest, opts ...grpc.CallOption) (*AddBudgetResponse, error)
+	SeedBudget(ctx context.Context, in *SeedBudgetRequest, opts ...grpc.CallOption) (*SeedBudgetResponse, error)
 	GetBudget(ctx context.Context, in *GetBudgetRequest, opts ...grpc.CallOption) (*GetBudgetResponse, error)
 	GetSold(ctx context.Context, in *GetSoldRequest, opts ...grpc.CallOption) (*GetSoldResponse, error)
 }
@@ -27,6 +29,24 @@ type recordBudgetServiceClient struct {
 
 func NewRecordBudgetServiceClient(cc grpc.ClientConnInterface) RecordBudgetServiceClient {
 	return &recordBudgetServiceClient{cc}
+}
+
+func (c *recordBudgetServiceClient) AddBudget(ctx context.Context, in *AddBudgetRequest, opts ...grpc.CallOption) (*AddBudgetResponse, error) {
+	out := new(AddBudgetResponse)
+	err := c.cc.Invoke(ctx, "/recordbudget.RecordBudgetService/AddBudget", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *recordBudgetServiceClient) SeedBudget(ctx context.Context, in *SeedBudgetRequest, opts ...grpc.CallOption) (*SeedBudgetResponse, error) {
+	out := new(SeedBudgetResponse)
+	err := c.cc.Invoke(ctx, "/recordbudget.RecordBudgetService/SeedBudget", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *recordBudgetServiceClient) GetBudget(ctx context.Context, in *GetBudgetRequest, opts ...grpc.CallOption) (*GetBudgetResponse, error) {
@@ -51,6 +71,8 @@ func (c *recordBudgetServiceClient) GetSold(ctx context.Context, in *GetSoldRequ
 // All implementations should embed UnimplementedRecordBudgetServiceServer
 // for forward compatibility
 type RecordBudgetServiceServer interface {
+	AddBudget(context.Context, *AddBudgetRequest) (*AddBudgetResponse, error)
+	SeedBudget(context.Context, *SeedBudgetRequest) (*SeedBudgetResponse, error)
 	GetBudget(context.Context, *GetBudgetRequest) (*GetBudgetResponse, error)
 	GetSold(context.Context, *GetSoldRequest) (*GetSoldResponse, error)
 }
@@ -59,6 +81,12 @@ type RecordBudgetServiceServer interface {
 type UnimplementedRecordBudgetServiceServer struct {
 }
 
+func (UnimplementedRecordBudgetServiceServer) AddBudget(context.Context, *AddBudgetRequest) (*AddBudgetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddBudget not implemented")
+}
+func (UnimplementedRecordBudgetServiceServer) SeedBudget(context.Context, *SeedBudgetRequest) (*SeedBudgetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SeedBudget not implemented")
+}
 func (UnimplementedRecordBudgetServiceServer) GetBudget(context.Context, *GetBudgetRequest) (*GetBudgetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBudget not implemented")
 }
@@ -75,6 +103,42 @@ type UnsafeRecordBudgetServiceServer interface {
 
 func RegisterRecordBudgetServiceServer(s grpc.ServiceRegistrar, srv RecordBudgetServiceServer) {
 	s.RegisterService(&_RecordBudgetService_serviceDesc, srv)
+}
+
+func _RecordBudgetService_AddBudget_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddBudgetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RecordBudgetServiceServer).AddBudget(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/recordbudget.RecordBudgetService/AddBudget",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RecordBudgetServiceServer).AddBudget(ctx, req.(*AddBudgetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RecordBudgetService_SeedBudget_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SeedBudgetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RecordBudgetServiceServer).SeedBudget(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/recordbudget.RecordBudgetService/SeedBudget",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RecordBudgetServiceServer).SeedBudget(ctx, req.(*SeedBudgetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _RecordBudgetService_GetBudget_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -117,6 +181,14 @@ var _RecordBudgetService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "recordbudget.RecordBudgetService",
 	HandlerType: (*RecordBudgetServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddBudget",
+			Handler:    _RecordBudgetService_AddBudget_Handler,
+		},
+		{
+			MethodName: "SeedBudget",
+			Handler:    _RecordBudgetService_SeedBudget_Handler,
+		},
 		{
 			MethodName: "GetBudget",
 			Handler:    _RecordBudgetService_GetBudget_Handler,
