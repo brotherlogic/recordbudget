@@ -142,6 +142,9 @@ func (s Server) SeedBudget(ctx context.Context, req *pb.SeedBudgetRequest) (*pb.
 
 	for _, budget := range config.GetBudgets() {
 		if budget.GetName() == req.GetName() {
+			if budget.Seeds == nil {
+				budget.Seeds = make(map[int64]int32)
+			}
 			budget.Seeds[req.GetTimestamp()] = req.GetAmount()
 			return &pb.SeedBudgetResponse{}, s.save(ctx, config)
 		}

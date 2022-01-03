@@ -63,6 +63,8 @@ func main() {
 				req.Type = pb.BudgetType_QUARTERLY
 			case "infinite":
 				req.Type = pb.BudgetType_INFINITE
+			case "year":
+				req.Type = pb.BudgetType_YEARLY
 			default:
 				log.Fatalf("%v is not a know budget type", *btype)
 			}
@@ -70,6 +72,30 @@ func main() {
 			_, err := client.AddBudget(ctx, req)
 			if err != nil {
 				log.Fatalf("Unable to add budget: %v", err)
+			}
+		}
+	case "seed":
+		seedFlags := flag.NewFlagSet("seed", flag.ExitOnError)
+		var name = seedFlags.String("name", "", "The name of the budget")
+		var btype = seedFlags.String("type", "yearly", "value")
+		var amount = seedFlags.Int("amount", -1, "Amount")
+		if err := seedFlags.Parse(os.Args[2:]); err == nil {
+			if *amount < 101 {
+				log.Fatalf("You must seed with a valid amount: %v", *amount)
+			}
+			switch *btype {
+			case "yearly":
+				for i := 0; i < 12; i++ {
+					dd := time.Date(time.Now().Year(), time.Month(i+1), 1, 0, 0, 0, 0, time.Local)
+					_, err := client.SeedBudget(ctx, &pb.SeedBudgetRequest{
+						Name:      *name,
+						Timestamp: dd.Unix(),
+						Amount:    int32(*amount),
+					})
+					if err != nil {
+						log.Fatalf("Failed on %v for %v -> %v", dd, *name, err)
+					}
+				}
 			}
 		}
 	case "get":
