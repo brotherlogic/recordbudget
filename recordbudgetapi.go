@@ -65,6 +65,19 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 	if req.GetBudget() != "" {
 		for _, budget := range config.GetBudgets() {
 			if budget.GetName() == req.GetBudget() {
+				spent := int32(0)
+				made := int32(0)
+				for d, m := range budget.GetSeeds() {
+					if time.Since(time.Unix(d, 0)) > time.Second {
+						made += m
+					}
+				}
+
+				for _, sp := range budget.GetSpends() {
+					sp += spent
+				}
+				budget.Remaining = made - spent
+
 				return &pb.GetBudgetResponse{ChosenBudget: budget}, nil
 			}
 		}
