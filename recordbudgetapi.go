@@ -55,6 +55,23 @@ func (s *Server) getBudget(ctx context.Context, t time.Time) int32 {
 	return int32(days * dailyBudget * 100)
 }
 
+func (s *Server) updateBudgets(config *pb.Config) {
+	for _, budget := range config.GetBudgets() {
+		spent := int32(0)
+		made := int32(0)
+		for d, m := range budget.GetSeeds() {
+			if time.Since(time.Unix(d, 0)) > time.Second {
+				made += m
+			}
+		}
+
+		for _, sp := range budget.GetSpends() {
+			sp += spent
+		}
+		budget.Remaining = made - spent
+	}
+}
+
 //GetBudget API Call
 func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.GetBudgetResponse, error) {
 	config, err := s.load(ctx)
@@ -62,26 +79,13 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
-	if req.GetBudget() != "" {
-		for _, budget := range config.GetBudgets() {
-			if budget.GetName() == req.GetBudget() {
-				spent := int32(0)
-				made := int32(0)
-				for d, m := range budget.GetSeeds() {
-					if time.Since(time.Unix(d, 0)) > time.Second {
-						made += m
-					}
-				}
-
-				for _, sp := range budget.GetSpends() {
-					sp += spent
-				}
-				budget.Remaining = made - spent
-
-				return &pb.GetBudgetResponse{ChosenBudget: budget}, nil
-			}
+	for _, budget := range config.GetBudgets() {
+		if budget.GetName() == req.GetBudget() {
+			return &pb.GetBudgetResponse{ChosenBudget: budget}, nil
 		}
+	}
 
+	if req.GetBudget() != "" {
 		return nil, status.Errorf(codes.NotFound, "The budget %v was not found", req.GetBudget())
 	}
 
