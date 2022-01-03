@@ -52,6 +52,26 @@ func main() {
 	client := pb.NewRecordBudgetServiceClient(conn)
 
 	switch os.Args[1] {
+	case "add":
+		addFlags := flag.NewFlagSet("add", flag.ExitOnError)
+		var name = addFlags.String("name", "", "The name of the budget")
+		var btype = addFlags.String("type", "quarter", "The type of the budget")
+		if err := addFlags.Parse(os.Args[2:]); err == nil {
+			req := &pb.AddBudgetRequest{Name: *name}
+			switch *btype {
+			case "quarter":
+				req.Type = pb.BudgetType_QUARTERLY
+			case "infinite":
+				req.Type = pb.BudgetType_QUARTERLY
+			default:
+				log.Fatalf("%v is not a know budget type", *btype)
+			}
+
+			_, err := client.AddBudget(ctx, req)
+			if err != nil {
+				log.Fatalf("Unable to add budget: %v", err)
+			}
+		}
 	case "sold":
 		soldFlags := flag.NewFlagSet("sold", flag.ExitOnError)
 		var id = soldFlags.Int("id", -1, "Id of the record to add")
@@ -94,5 +114,7 @@ func main() {
 				log.Fatalf("Error getting budget: %v", err)
 			}
 		}
+	default:
+		log.Fatalf("%v is not a valid option", os.Args[1])
 	}
 }
