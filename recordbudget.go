@@ -189,6 +189,8 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	lastOrderDate.Set(float64(config.GetLastOrderPullDate()))
 	orderCount.Set(float64(len(config.Orders)))
 
+	s.metrics(config)
+
 	return config, nil
 }
 

@@ -62,6 +62,16 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, err
 	}
 
+	if req.GetBudget() != "" {
+		for _, budget := range config.GetBudgets() {
+			if budget.GetName() == req.GetBudget() {
+				return &pb.GetBudgetResponse{ChosenBudget: budget}, nil
+			}
+		}
+
+		return nil, status.Errorf(codes.NotFound, "The budget %v was not found", req.GetBudget())
+	}
+
 	_, err = s.rebuildPreBudget(ctx, config)
 	if err != nil {
 		return nil, err

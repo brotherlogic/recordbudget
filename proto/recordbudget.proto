@@ -29,6 +29,9 @@ message Budget {
   BudgetType type = 2;
 
   map<int64, int32> seeds = 3;
+  map<int32, int32> spends = 4;
+
+  int32 remaining = 5;
 }
 
 

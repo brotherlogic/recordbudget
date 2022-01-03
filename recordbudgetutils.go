@@ -12,7 +12,21 @@ import (
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbrs "github.com/brotherlogic/recordscores/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
+
+var (
+	budgets = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "recordbudget_budgets",
+		Help: "The amount of potential salve value",
+	}, []string{"budget"})
+)
+
+func (s *Server) metrics(c *pb.Config) {
+	for _, budget := range c.GetBudgets() {
+		budgets.With(prometheus.Labels{"budget": budget.GetName()}).Set(float64(budget.GetRemaining()))
+	}
+}
 
 func (s *Server) adjustDate(r *rcpb.Record) int64 {
 	dateAdded := time.Unix(r.GetMetadata().GetDateAdded(), 0)
