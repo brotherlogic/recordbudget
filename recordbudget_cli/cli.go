@@ -62,7 +62,7 @@ func main() {
 			case "quarter":
 				req.Type = pb.BudgetType_QUARTERLY
 			case "infinite":
-				req.Type = pb.BudgetType_QUARTERLY
+				req.Type = pb.BudgetType_INFINITE
 			default:
 				log.Fatalf("%v is not a know budget type", *btype)
 			}
@@ -71,6 +71,23 @@ func main() {
 			if err != nil {
 				log.Fatalf("Unable to add budget: %v", err)
 			}
+		}
+	case "get":
+		getFlags := flag.NewFlagSet("get", flag.ExitOnError)
+		var name = getFlags.String("name", "", "The name of the budget")
+		if err := getFlags.Parse(os.Args[2:]); err == nil {
+			res, err := client.GetBudget(ctx, &pb.GetBudgetRequest{Budget: *name})
+			if err != nil {
+				log.Fatalf("Cannot get budget: %v", err)
+			}
+
+			fmt.Printf("Budget: %v [%v]\n", res.GetChosenBudget().GetName(), res.GetChosenBudget().GetType())
+			fmt.Printf("Remaining: %v\n", res.GetChosenBudget().GetRemaining())
+			sum := int32(0)
+			for _, spend := range res.GetChosenBudget().GetSpends() {
+				sum += spend
+			}
+			fmt.Sprintf("Spent: %v\n", sum)
 		}
 	case "sold":
 		soldFlags := flag.NewFlagSet("sold", flag.ExitOnError)

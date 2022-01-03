@@ -118,6 +118,10 @@ func (s *Server) AddBudget(ctx context.Context, req *pb.AddBudgetRequest) (*pb.A
 
 	for _, budget := range config.GetBudgets() {
 		if budget.GetName() == req.GetName() {
+			if budget.GetType() != req.GetType() {
+				budget.Type = req.GetType()
+				return &pb.AddBudgetResponse{}, s.save(ctx, config)
+			}
 			return nil, status.Errorf(codes.AlreadyExists, "%v already exists", req.GetName())
 		}
 	}
