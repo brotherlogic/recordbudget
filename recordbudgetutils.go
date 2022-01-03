@@ -24,7 +24,11 @@ var (
 
 func (s *Server) metrics(c *pb.Config) {
 	for _, budget := range c.GetBudgets() {
-		budgets.With(prometheus.Labels{"budget": budget.GetName()}).Set(float64(budget.GetRemaining()))
+		if budget.GetType() == pb.BudgetType_INFINITE {
+			budgets.With(prometheus.Labels{"budget": budget.GetName()}).Set(float64(50))
+		} else {
+			budgets.With(prometheus.Labels{"budget": budget.GetName()}).Set(float64(budget.GetRemaining()))
+		}
 	}
 }
 
