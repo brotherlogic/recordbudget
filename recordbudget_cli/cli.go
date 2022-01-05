@@ -96,6 +96,17 @@ func main() {
 						log.Fatalf("Failed on %v for %v -> %v", dd, *name, err)
 					}
 				}
+			case "once":
+				_, err := client.SeedBudget(ctx, &pb.SeedBudgetRequest{
+					Name:      *name,
+					Timestamp: time.Now().Unix(),
+					Amount:    int32(*amount),
+				})
+				if err != nil {
+					log.Fatalf("Failed on %v for %v -> %v", time.Now().Unix(), *name, err)
+				}
+			default:
+				log.Fatalf("Unknown seed type: %v", *btype)
 			}
 		}
 	case "get":
