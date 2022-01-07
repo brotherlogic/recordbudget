@@ -192,6 +192,13 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	s.updateBudgets(config)
 	s.metrics(config)
 
+	for _, budget := range config.Budgets {
+		if budget.GetName() == "digital" {
+			budget.Type = pb.BudgetType_YEARLY
+			budget.SaleFed = true
+		}
+	}
+
 	return config, nil
 }
 
