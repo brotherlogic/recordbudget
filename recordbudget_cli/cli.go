@@ -124,7 +124,7 @@ func main() {
 			for _, spend := range res.GetChosenBudget().GetSpends() {
 				sum += spend
 			}
-			fmt.Sprintf("Spent: %v\n", sum)
+			fmt.Printf("Spent: %v\n", sum)
 		}
 	case "sold":
 		soldFlags := flag.NewFlagSet("sold", flag.ExitOnError)

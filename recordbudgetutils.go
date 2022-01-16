@@ -254,4 +254,6 @@ func (s *Server) adjustBudget(budget *pb.Budget, config *pb.Config) {
 			budget.Spends[purchase.GetInstanceId()] = purchase.Cost
 		}
 	}
+
+	s.updateBudgets(config)
 }
