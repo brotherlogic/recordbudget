@@ -66,7 +66,7 @@ func (s *Server) updateBudgets(config *pb.Config) {
 		}
 
 		for _, sp := range budget.GetSpends() {
-			sp += spent
+			spent += sp
 		}
 		budget.Remaining = made - spent
 	}
