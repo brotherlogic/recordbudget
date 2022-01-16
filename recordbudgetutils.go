@@ -173,7 +173,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 
 	for _, re := range config.GetPurchases() {
 		if re.GetInstanceId() == iid {
-			if re.GetBudget() == "" && r.GetMetadata().GetPurchaseBudget() != "" {
+			if re.GetBudget() != r.GetMetadata().GetPurchaseBudget() {
 				re.Budget = r.GetMetadata().GetPurchaseBudget()
 				return s.save(ctx, config)
 			}
@@ -248,6 +248,9 @@ func (s Server) getTotalSpend(year int) int32 {
 func (s *Server) adjustBudget(budget *pb.Budget, config *pb.Config) {
 	for _, purchase := range config.GetPurchases() {
 		if purchase.GetBudget() == budget.GetName() {
+			if budget.Spends == nil {
+				budget.Spends = make(map[int32]int32)
+			}
 			budget.Spends[purchase.GetInstanceId()] = purchase.Cost
 		}
 	}
