@@ -120,12 +120,14 @@ func main() {
 			}
 
 			fmt.Printf("Budget: %v [%v]\n", res.GetChosenBudget().GetName(), res.GetChosenBudget().GetType())
-			fmt.Printf("Remaining: %v\n", res.GetChosenBudget().GetRemaining())
 			sum := int32(0)
 			for _, spend := range res.GetChosenBudget().GetSpends() {
 				sum += spend
 			}
 			fmt.Printf("Spent: %v\n", sum)
+			fmt.Printf("Made: %v\n", res.GetChosenBudget().GetSolds())
+			fmt.Printf("Remaining: %v\n", res.GetChosenBudget().GetRemaining())
+
 		}
 	case "sold":
 		soldFlags := flag.NewFlagSet("sold", flag.ExitOnError)
