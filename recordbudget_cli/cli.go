@@ -56,8 +56,9 @@ func main() {
 		addFlags := flag.NewFlagSet("add", flag.ExitOnError)
 		var name = addFlags.String("name", "", "The name of the budget")
 		var btype = addFlags.String("type", "quarter", "The type of the budget")
+		var sfed = addFlags.Bool("sales", false, "If the budget is fed from sales")
 		if err := addFlags.Parse(os.Args[2:]); err == nil {
-			req := &pb.AddBudgetRequest{Name: *name}
+			req := &pb.AddBudgetRequest{Name: *name, SaleFed: *sfed}
 			switch *btype {
 			case "quarter":
 				req.Type = pb.BudgetType_QUARTERLY

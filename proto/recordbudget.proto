@@ -94,6 +94,7 @@ message GetSoldResponse {
 message AddBudgetRequest {
   string name = 1;
   BudgetType type = 2;
+  bool sale_fed = 3;
 }
 
 message AddBudgetResponse {}
