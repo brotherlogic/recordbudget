@@ -255,5 +255,21 @@ func (s *Server) adjustBudget(budget *pb.Budget, config *pb.Config) {
 		}
 	}
 
+	if budget.GetSaleFed() {
+		sfcount := int32(0)
+		for _, budget := range config.GetBudgets() {
+			if budget.SaleFed {
+				sfcount++
+			}
+		}
+
+		solds := int32(0)
+		for _, sale := range config.Solds {
+			solds += sale.GetPrice()
+		}
+		s.Log(fmt.Sprintf("Found %v in sales with %v sale fed budgets", solds, sfcount))
+		budget.Solds = solds / sfcount
+	}
+
 	s.updateBudgets(config)
 }
