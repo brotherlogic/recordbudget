@@ -265,7 +265,9 @@ func (s *Server) adjustBudget(budget *pb.Budget, config *pb.Config) {
 
 		solds := int32(0)
 		for _, sale := range config.Solds {
-			solds += sale.GetPrice()
+			if time.Unix(sale.GetSoldDate(), 0).Year() == time.Now().Year() {
+				solds += sale.GetPrice()
+			}
 		}
 		s.Log(fmt.Sprintf("Found %v in sales with %v sale fed budgets", solds, sfcount))
 		budget.Solds = solds / sfcount
