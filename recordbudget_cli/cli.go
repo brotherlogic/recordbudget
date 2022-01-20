@@ -119,7 +119,7 @@ func main() {
 				log.Fatalf("Cannot get budget: %v", err)
 			}
 
-			fmt.Printf("Budget: %v [%v]\n", res.GetChosenBudget().GetName(), res.GetChosenBudget().GetType())
+			fmt.Printf("Budget: %v [%v] [%v]\n", res.GetChosenBudget().GetName(), res.GetChosenBudget().GetType(), res.GetChosenBudget().GetSaleFed())
 			sum := int32(0)
 			for _, spend := range res.GetChosenBudget().GetSpends() {
 				sum += spend
