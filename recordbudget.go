@@ -197,6 +197,9 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 			budget.Type = pb.BudgetType_YEARLY
 			budget.SaleFed = false
 		}
+		if budget.GetName() == "Boosey" {
+			budget.SaleFed = true
+		}
 	}
 
 	return config, nil
