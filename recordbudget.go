@@ -27,10 +27,6 @@ var (
 		Name: "recordbudget_budget",
 		Help: "The size of the print queue",
 	})
-	spent = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "recordbudget_spent",
-		Help: "Total amount spent",
-	}, []string{"year"})
 )
 
 func init() {
