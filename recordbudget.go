@@ -198,7 +198,7 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 			budget.SaleFed = true
 		}
 		if budget.GetName() == "Boosey" {
-			budget.SaleFed = false
+			budget.SaleFed = true
 		}
 	}
 

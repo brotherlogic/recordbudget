@@ -126,6 +126,7 @@ func main() {
 			fmt.Printf("Spent: %v\n", sum)
 			fmt.Printf("Made: %v\n", res.GetChosenBudget().GetSolds())
 			fmt.Printf("Remaining: %v\n", res.GetChosenBudget().GetRemaining())
+			fmt.Printf("Seeds: %v\n", res.GetChosenBudget().GetSeeds())
 
 		}
 	case "sold":
