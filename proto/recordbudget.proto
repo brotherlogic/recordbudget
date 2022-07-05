@@ -15,6 +15,7 @@ message Config {
   int64 last_order_pull_date = 7;
 
   repeated Budget budgets = 8;
+  int32 tracking = 9;
 }
 
   enum BudgetType {
