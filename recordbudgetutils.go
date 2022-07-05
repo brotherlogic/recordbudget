@@ -68,7 +68,11 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	order, err := s.rc.getOrder(ctx, config.LastOrderPull)
 	lastOrderNumber.With(prometheus.Labels{"response": fmt.Sprintf("%v", err)}).Set(float64(config.LastOrderPull))
 	if err != nil {
-		if status.Convert(err).Code() == codes.FailedPrecondition || status.Convert(err).Code() == codes.NotFound {
+		if status.Convert(err).Code() == codes.FailedPrecondition {
+			s.RaiseIssue("Incomplete Order", fmt.Sprintf("Order %v needs completion: https://www.discogs.com/sell/order/150295-%v", config.LastOrderPull, config.LastOrderPull))
+			return config, nil
+		}
+		if status.Convert(err).Code() == codes.NotFound {
 			//Just silently ignore this - and keep moving
 			return config, nil
 		}
