@@ -195,7 +195,7 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	for _, budget := range config.Budgets {
 		if budget.GetName() == "digital" {
 			budget.Type = pb.BudgetType_YEARLY
-			budget.SaleFed = true
+			budget.SaleFed = false
 		}
 		if budget.GetName() == "Boosey" {
 			budget.SaleFed = true
