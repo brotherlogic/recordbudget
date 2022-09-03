@@ -81,7 +81,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 
 	for _, budget := range config.GetBudgets() {
 		if budget.GetName() == req.GetBudget() {
-			s.adjustBudget(budget, config)
+			s.adjustBudget(ctx, budget, config)
 			return &pb.GetBudgetResponse{ChosenBudget: budget}, nil
 		}
 	}
@@ -97,7 +97,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 
 	spend, preSpends, ids, pre, slds, dtg := s.computeSpends(ctx, config, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
-	s.Log(fmt.Sprintf("%v", config.PrePurchases))
+	s.CtxLog(ctx, fmt.Sprintf("%v", config.PrePurchases))
 
 	spends.Set(float64(spend))
 	prespends.Set(float64(preSpends))

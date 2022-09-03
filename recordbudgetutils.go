@@ -45,23 +45,23 @@ func (s *Server) metrics(c *pb.Config) {
 	}
 }
 
-func (s *Server) adjustDate(r *rcpb.Record) int64 {
+func (s *Server) adjustDate(ctx context.Context, r *rcpb.Record) int64 {
 	dateAdded := time.Unix(r.GetMetadata().GetDateAdded(), 0)
 	if r.GetMetadata().GetAccountingYear() > 0 {
 		dateAdded = dateAdded.AddDate(int(r.GetMetadata().GetAccountingYear())-dateAdded.Year(), 0, 0)
-		s.Log(fmt.Sprintf("Adjusting %v to %v", r.GetRelease().GetTitle(), dateAdded))
+		s.CtxLog(ctx, fmt.Sprintf("Adjusting %v to %v", r.GetRelease().GetTitle(), dateAdded))
 	}
 	return dateAdded.Unix()
 }
 
 func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config, error) {
-	s.Log(fmt.Sprintf("Pulling orders from this time %v", config.LastOrderPull))
+	s.CtxLog(ctx, fmt.Sprintf("Pulling orders from this time %v", config.LastOrderPull))
 
 	// Order numbers start at zero, so adjust
 	if config.LastOrderPull == 0 {
 		config.LastOrderPull = 1
 	}
-	s.Log(fmt.Sprintf("Adjusted to %v", config.LastOrderPull))
+	s.CtxLog(ctx, fmt.Sprintf("Adjusted to %v", config.LastOrderPull))
 
 	config.LastOrderPullDate = time.Now().Unix()
 
@@ -70,7 +70,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			if config.Tracking == 0 {
-				num, err := s.ImmediateIssue(ctx, "Incomplete Order Alert", fmt.Sprintf("Order %v needs completion: https://www.discogs.com/sell/order/150295-%v", config.LastOrderPull, config.LastOrderPull))
+				num, err := s.ImmediateIssue(ctx, "Incomplete Order Alert", fmt.Sprintf("Order %v needs completion: https://www.discogs.com/sell/order/150295-%v", config.LastOrderPull, config.LastOrderPull), true)
 				if err != nil {
 					return nil, err
 				}
@@ -141,7 +141,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		for _, order := range config.GetOrders() {
 			if order.GetListingId() == r.GetMetadata().GetSaleId() {
 				err := s.rc.updateRecord(ctx, iid, order)
-				s.Log(fmt.Sprintf("Trying %v and %v -> %v", r.GetMetadata().GetSoldDate(), r.GetMetadata().GetSaleId(), err))
+				s.CtxLog(ctx, fmt.Sprintf("Trying %v and %v -> %v", r.GetMetadata().GetSoldDate(), r.GetMetadata().GetSaleId(), err))
 				if err != nil {
 					return err
 				}
@@ -209,7 +209,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		}
 	}
 
-	dateAdded := s.adjustDate(r)
+	dateAdded := s.adjustDate(ctx, r)
 
 	for i, pp := range config.GetPrePurchases() {
 		if pp.GetId() == r.GetRelease().GetId() {
@@ -245,7 +245,7 @@ func (s *Server) rebuildPreBudget(ctx context.Context, config *pb.Config) (*pb.C
 		return nil, err
 	}
 
-	s.Log(fmt.Sprintf("Resetting"))
+	s.CtxLog(ctx, fmt.Sprintf("Resetting"))
 	config.PrePurchases = make([]*pb.PreBoughtRecord, 0)
 	for _, rec := range recs {
 		found := false
@@ -273,7 +273,7 @@ func (s Server) getTotalSpend(year int) int32 {
 	return spend
 }
 
-func (s *Server) adjustBudget(budget *pb.Budget, config *pb.Config) {
+func (s *Server) adjustBudget(ctx context.Context, budget *pb.Budget, config *pb.Config) {
 	for _, purchase := range config.GetPurchases() {
 		if purchase.GetBudget() == budget.GetName() {
 			if budget.Spends == nil {
@@ -297,7 +297,7 @@ func (s *Server) adjustBudget(budget *pb.Budget, config *pb.Config) {
 				solds += sale.GetPrice()
 			}
 		}
-		s.Log(fmt.Sprintf("Found %v in sales with %v sale fed budgets", solds, sfcount))
+		s.CtxLog(ctx, fmt.Sprintf("Found %v in sales with %v sale fed budgets", solds, sfcount))
 		budget.Solds = solds / sfcount
 	}
 
