@@ -72,7 +72,7 @@ func (s *Server) updateBudgets(config *pb.Config) {
 	}
 }
 
-//GetBudget API Call
+// GetBudget API Call
 func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.GetBudgetResponse, error) {
 	config, err := s.load(ctx)
 	if err != nil {
@@ -81,7 +81,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 
 	for _, budget := range config.GetBudgets() {
 		if budget.GetName() == req.GetBudget() {
-			s.adjustBudget(ctx, budget, config)
+			//s.adjustBudget(ctx, budget, config)
 			return &pb.GetBudgetResponse{ChosenBudget: budget}, nil
 		}
 	}
@@ -108,7 +108,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 	return &pb.GetBudgetResponse{Spends: spend, PreSpends: preSpends, Budget: budget, PurchasedIds: ids, PrePurchasedIds: pre, Solds: slds}, s.save(ctx, config)
 }
 
-//ClientUpdate on an updated record
+// ClientUpdate on an updated record
 func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest) (*rcpb.ClientUpdateResponse, error) {
 	return &rcpb.ClientUpdateResponse{}, s.processRec(ctx, req.GetInstanceId())
 }
