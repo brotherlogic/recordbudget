@@ -81,7 +81,7 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 
 	for _, budget := range config.GetBudgets() {
 		if budget.GetName() == req.GetBudget() {
-			//s.adjustBudget(ctx, budget, config)
+			s.adjustBudget(ctx, budget, config)
 			return &pb.GetBudgetResponse{ChosenBudget: budget}, nil
 		}
 	}

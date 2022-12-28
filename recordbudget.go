@@ -136,7 +136,7 @@ func (p *prc) updateRecord(ctx context.Context, iid int32, order *pb.Order) erro
 	return err
 }
 
-//Server main server type
+// Server main server type
 type Server struct {
 	*goserver.GoServer
 	config *pb.Config
@@ -168,7 +168,7 @@ func (s *Server) ReportHealth() bool {
 	return true
 }
 
-//Shutdown the server
+// Shutdown the server
 func (s *Server) Shutdown(ctx context.Context) error {
 	return nil
 }
@@ -209,7 +209,16 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 }
 
 func (s *Server) save(ctx context.Context, config *pb.Config) error {
-	return s.KSclient.Save(ctx, CONFIG, config)
+	for _, budget := range config.GetBudgets() {
+		s.adjustBudget(ctx, budget, config)
+	}
+	err := s.KSclient.Save(ctx, CONFIG, config)
+	if err != nil {
+		return err
+	}
+
+	s.metrics(config)
+	return err
 }
 
 // Mote promotes/demotes this server
