@@ -14,6 +14,9 @@ type RecordBudgetClient struct {
 }
 
 func (c *RecordBudgetClient) AddBudget(budget *pb.Budget) {
+	if c.budgets == nil {
+		c.budgets = make(map[string]*pb.Budget)
+	}
 	c.budgets[budget.GetName()] = budget
 }
 
