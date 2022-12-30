@@ -8,13 +8,18 @@ import (
 )
 
 type RecordBudgetClient struct {
-	Gs   *pbgs.GoServer
-	Test bool
+	Gs      *pbgs.GoServer
+	Test    bool
+	budgets map[string]*pb.Budget
+}
+
+func (c *RecordBudgetClient) AddBudget(budget *pb.Budget) {
+	c.budgets[budget.GetName()] = budget
 }
 
 func (c *RecordBudgetClient) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.GetBudgetResponse, error) {
 	if c.Test {
-		return &pb.GetBudgetResponse{}, nil
+		return &pb.GetBudgetResponse{ChosenBudget: c.budgets[req.GetBudget()]}, nil
 	}
 
 	conn, err := c.Gs.FDialServer(ctx, "recordbudget")
