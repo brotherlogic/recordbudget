@@ -12,7 +12,7 @@ type RecordBudgetClient struct {
 	Test bool
 }
 
-func (c *RecordBudgetClient) GetRecord(ctx context.Context, req *pb.GetBudgetRequest) (*pb.GetBudgetResponse, error) {
+func (c *RecordBudgetClient) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.GetBudgetResponse, error) {
 	if c.Test {
 		return &pb.GetBudgetResponse{}, nil
 	}
