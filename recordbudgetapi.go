@@ -127,9 +127,17 @@ func (s *Server) AddBudget(ctx context.Context, req *pb.AddBudgetRequest) (*pb.A
 	config.Budgets = append(config.Budgets, &pb.Budget{
 		Name: req.GetName(),
 		Type: req.GetType(),
+		End:  getEnd(req.GetType()),
 	})
 
 	return &pb.AddBudgetResponse{}, s.save(ctx, config)
+}
+
+func getEnd(ty pb.BudgetType) int64 {
+	if ty == pb.BudgetType_YEARLY {
+		return time.Date(time.Now().Year(), time.December, 31, 23, 59, 59, 0, time.Now().Location()).Unix()
+	}
+	return 0
 }
 
 func (s Server) SeedBudget(ctx context.Context, req *pb.SeedBudgetRequest) (*pb.SeedBudgetResponse, error) {
