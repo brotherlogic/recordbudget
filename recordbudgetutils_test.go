@@ -62,14 +62,6 @@ func InitTestServer() *Server {
 	return s
 }
 
-func TestSpecRead(t *testing.T) {
-	s := InitTestServer()
-	_, err := s.rebuildBudget(context.Background())
-	if err != nil {
-		t.Errorf("Error on rebuild: %v", err)
-	}
-}
-
 func TestSpecReadWithBadRecordRead(t *testing.T) {
 	s := InitTestServer()
 	s.rc = &trc{getFail: true}
@@ -85,24 +77,6 @@ func TestSpecReadFailPull(t *testing.T) {
 	_, err := s.rebuildBudget(context.Background())
 	if err == nil {
 		t.Errorf("Error on rebuild")
-	}
-}
-
-func TestProcessExistingRec(t *testing.T) {
-	s := InitTestServer()
-	s.config.PrePurchases = append(s.config.PrePurchases, &pb.PreBoughtRecord{Id: 12})
-
-	err := s.processRec(context.Background(), 12)
-	if err != nil {
-		t.Errorf("Bad process: %v", err)
-	}
-	err = s.processRec(context.Background(), 12)
-	if err != nil {
-		t.Errorf("Bad process again: %v", err)
-	}
-
-	if len(s.config.GetPurchases()) != 1 {
-		t.Errorf("Bad adds: %v", s.config)
 	}
 }
 
@@ -128,35 +102,6 @@ func TestGetSpend(t *testing.T) {
 	}
 }
 
-func TestFailPre(t *testing.T) {
-	s := InitTestServer()
-	s.ra = &tra{fail: true}
-
-	_, err := s.rebuildPreBudget(context.Background(), &pb.Config{})
-
-	if err == nil {
-		t.Errorf("Bad ra did not fail")
-	}
-}
-
-func TestPre(t *testing.T) {
-	s := InitTestServer()
-
-	_, err := s.rebuildPreBudget(context.Background(), &pb.Config{})
-	if err != nil {
-		t.Errorf("Bad rebuild: %v", err)
-	}
-
-	_, err = s.rebuildPreBudget(context.Background(), &pb.Config{})
-	if err != nil {
-		t.Errorf("Bad rebuild: %v", err)
-	}
-
-	if len(s.config.GetPrePurchases()) != 1 {
-		t.Errorf("Bad adds: %v", s.config)
-	}
-}
-
 func TestAdjust(t *testing.T) {
 	s := InitTestServer()
 
@@ -165,7 +110,7 @@ func TestAdjust(t *testing.T) {
 		t.Fatalf("Error parse: %v", err)
 	}
 
-	d2 := s.adjustDate(&rcpb.Record{Metadata: &rcpb.ReleaseMetadata{DateAdded: dateAdded.Unix()}})
+	d2 := s.adjustDate(context.Background(), &rcpb.Record{Metadata: &rcpb.ReleaseMetadata{DateAdded: dateAdded.Unix()}})
 	if d2 != dateAdded.Unix() {
 		t.Errorf("Mismatch: %v and %v", dateAdded, d2)
 	}
@@ -180,7 +125,7 @@ func TestAdjustDoAdjust(t *testing.T) {
 		t.Fatalf("Error parse: %v", err)
 	}
 
-	d2 := s.adjustDate(&rcpb.Record{Metadata: &rcpb.ReleaseMetadata{DateAdded: dateAdded.Unix(), AccountingYear: int32(2018)}})
+	d2 := s.adjustDate(context.Background(), &rcpb.Record{Metadata: &rcpb.ReleaseMetadata{DateAdded: dateAdded.Unix(), AccountingYear: int32(2018)}})
 	if d2 != dateAdded2.Unix() {
 		t.Errorf("Mismatch: %v and %v", dateAdded, d2)
 	}

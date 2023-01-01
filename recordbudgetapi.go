@@ -90,17 +90,11 @@ func (s *Server) GetBudget(ctx context.Context, req *pb.GetBudgetRequest) (*pb.G
 		return nil, status.Errorf(codes.NotFound, "The budget %v was not found", req.GetBudget())
 	}
 
-	_, err = s.rebuildPreBudget(ctx, config)
-	if err != nil {
-		return nil, err
-	}
-
 	spend, preSpends, ids, pre, slds, dtg := s.computeSpends(ctx, config, int(req.GetYear()))
 	budget := s.getBudget(ctx, time.Now())
 	s.CtxLog(ctx, fmt.Sprintf("%v", config.PrePurchases))
 
 	spends.Set(float64(spend))
-	prespends.Set(float64(preSpends))
 	alloted.Set(float64(budget))
 	daysToGo.Set(float64(dtg))
 	solds.Set(float64(slds))

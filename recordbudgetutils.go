@@ -239,30 +239,6 @@ func (s *Server) rebuildBudget(ctx context.Context) (time.Time, error) {
 	return time.Now().Add(time.Hour * 1), err
 }
 
-func (s *Server) rebuildPreBudget(ctx context.Context, config *pb.Config) (*pb.Config, error) {
-	recs, err := s.ra.getAdds(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	s.CtxLog(ctx, fmt.Sprintf("Resetting"))
-	config.PrePurchases = make([]*pb.PreBoughtRecord, 0)
-	for _, rec := range recs {
-		found := false
-		for _, pre := range config.GetPrePurchases() {
-			if rec.GetId() == pre.GetId() {
-				found = true
-			}
-		}
-
-		if !found {
-			config.PrePurchases = append(config.PrePurchases, &pb.PreBoughtRecord{Id: rec.GetId(), Cost: rec.GetCost()})
-		}
-	}
-
-	return config, err
-}
-
 func (s Server) getTotalSpend(year int) int32 {
 	spend := int32(0)
 	for _, purchase := range s.config.GetPurchases() {

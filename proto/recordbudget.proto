@@ -35,6 +35,9 @@ message Budget {
   int32 remaining = 5;
   bool sale_fed = 6;
   int32 solds = 7;
+
+  int64 start = 8;
+  int64 end = 9;
 }
 
 
