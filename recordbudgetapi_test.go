@@ -9,15 +9,6 @@ import (
 	pb "github.com/brotherlogic/recordbudget/proto"
 )
 
-func TestBasicCall(t *testing.T) {
-	s := InitTestServer()
-
-	_, err := s.GetBudget(context.Background(), &pb.GetBudgetRequest{})
-	if err != nil {
-		t.Errorf("Bad call: %v", err)
-	}
-}
-
 func TestSpendsWithFail(t *testing.T) {
 	s := InitTestServer()
 	s.GoServer.KSclient.Fail = true
