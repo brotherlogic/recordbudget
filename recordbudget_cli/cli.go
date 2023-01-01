@@ -127,6 +127,7 @@ func main() {
 			fmt.Printf("Made: %v\n", res.GetChosenBudget().GetSolds())
 			fmt.Printf("Remaining: %v\n", res.GetChosenBudget().GetRemaining())
 			fmt.Printf("Seeds: %v\n", res.GetChosenBudget().GetSeeds())
+			fmt.Printf("Retires: %v\n", time.Unix(res.GetChosenBudget().GetEnd(), 0))
 
 		}
 	case "sold":

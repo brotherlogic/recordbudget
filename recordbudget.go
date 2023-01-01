@@ -186,6 +186,15 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 		return nil, fmt.Errorf("Unable to parse config")
 	}
 
+	// Prune expired budgets
+	var budgets []*pb.Budget
+	for _, budget := range config.GetBudgets() {
+		if time.Now().Before(time.Unix(budget.GetEnd(), 0)) {
+			budgets = append(budgets, budget)
+		}
+	}
+	config.Budgets = budgets
+
 	lastOrderDate.Set(float64(config.GetLastOrderPullDate()))
 	orderCount.Set(float64(len(config.Orders)))
 
