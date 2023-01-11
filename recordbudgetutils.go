@@ -120,6 +120,11 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	r, err := s.rc.getRecord(ctx, iid)
+
+	if r.GetMetadata().GetBudget() == "" {
+		return fmt.Errorf("This record has no matchable budget")
+	}
+
 	if err != nil {
 		if status.Convert(err).Code() == codes.OutOfRange {
 			pc := make([]*pb.BoughtRecord, 0)
