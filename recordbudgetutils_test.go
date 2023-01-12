@@ -47,6 +47,9 @@ func (t *trc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, er
 	if instanceID == 124 {
 		return &rcpb.Record{Release: &gdpb.Release{Id: 14}, Metadata: &rcpb.ReleaseMetadata{PurchaseBudget: "test", DateAdded: time.Now().Unix()}}, nil
 	}
+	if instanceID == 125 {
+		return &rcpb.Record{Release: &gdpb.Release{Id: 14}, Metadata: &rcpb.ReleaseMetadata{PurchaseBudget: "test", DateAdded: time.Now().Unix(), AccountingYear: 2020}}, nil
+	}
 	return &rcpb.Record{Release: &gdpb.Release{Id: 12}}, nil
 }
 

@@ -61,3 +61,28 @@ func TestBudgetAccountsFailedBecauseOfDate(t *testing.T) {
 	}
 	log.Printf("ERROR: %v", err)
 }
+
+func TestBudgetAccountsFailedBecauseOfDateButAccounts(t *testing.T) {
+	s := InitTestServer()
+
+	// This should not match because of the dates
+	_, err := s.AddBudget(context.Background(), &pb.AddBudgetRequest{
+		Name:  "test",
+		Start: time.Date(2019, time.January, 1, 12, 12, 12, 12, time.Now().Location()).Unix(),
+		End:   time.Date(2021, time.January, 1, 12, 12, 12, 12, time.Now().Location()).Unix(),
+	})
+
+	// Sniff out if the budget has been added
+	if err != nil {
+		t.Fatalf("Bad add of budget: %v", err)
+	}
+	budgets, err := s.GetBudget(context.Background(), &pb.GetBudgetRequest{Budget: "test"})
+	if err != nil {
+		t.Fatalf("Could not retreive budget: %v, %v", budgets, err)
+	}
+
+	_, err = s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 125})
+	if err != nil {
+		t.Errorf("Failure to add, probably accounting: %v", err)
+	}
+}
