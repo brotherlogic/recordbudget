@@ -41,11 +41,17 @@ func (t *trc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, er
 	if t.getFail {
 		return nil, fmt.Errorf("Built to fail")
 	}
+	if instanceID == 123 {
+		return &rcpb.Record{Release: &gdpb.Release{Id: 12}, Metadata: &rcpb.ReleaseMetadata{PurchaseBudget: "test", DateAdded: time.Now().Unix()}}, nil
+	}
+	if instanceID == 124 {
+		return &rcpb.Record{Release: &gdpb.Release{Id: 14}, Metadata: &rcpb.ReleaseMetadata{PurchaseBudget: "test", DateAdded: time.Now().Unix()}}, nil
+	}
 	return &rcpb.Record{Release: &gdpb.Release{Id: 12}}, nil
 }
 
 func (t *trc) getOrder(ctx context.Context, ID int32) (*rcpb.GetOrderResponse, error) {
-	return nil, fmt.Errorf("Not implemented")
+	return &rcpb.GetOrderResponse{}, nil
 }
 
 func (t *trc) updateRecord(ctx context.Context, iid int32, order *pb.Order) error {

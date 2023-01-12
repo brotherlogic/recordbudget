@@ -100,6 +100,8 @@ message AddBudgetRequest {
   string name = 1;
   BudgetType type = 2;
   bool sale_fed = 3;
+  int64 start = 4;
+  int64 end = 5;
 }
 
 message AddBudgetResponse {}
