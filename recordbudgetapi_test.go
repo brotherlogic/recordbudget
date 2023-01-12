@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -39,14 +40,24 @@ func TestBudgetAccountsFailedBecauseOfDate(t *testing.T) {
 	s := InitTestServer()
 
 	// This should not match because of the dates
-	s.AddBudget(context.Background(), &pb.AddBudgetRequest{
+	_, err := s.AddBudget(context.Background(), &pb.AddBudgetRequest{
 		Name:  "test",
 		Start: time.Now().Add(2 * -time.Hour).Unix(),
 		End:   time.Now().Add(-time.Hour).Unix(),
 	})
 
-	_, err := s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 123})
+	// Sniff out if the budget has been added
+	if err != nil {
+		t.Fatalf("Bad add of budget: %v", err)
+	}
+	budgets, err := s.GetBudget(context.Background(), &pb.GetBudgetRequest{Budget: "test"})
+	if err != nil {
+		t.Fatalf("Could not retreive budget: %v, %v", budgets, err)
+	}
+
+	_, err = s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: 124})
 	if err == nil {
 		t.Errorf("This should have failed because of the date")
 	}
+	log.Printf("ERROR: %v", err)
 }

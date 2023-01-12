@@ -125,15 +125,19 @@ func (s *Server) AddBudget(ctx context.Context, req *pb.AddBudgetRequest) (*pb.A
 	}
 
 	config.Budgets = append(config.Budgets, &pb.Budget{
-		Name: req.GetName(),
-		Type: req.GetType(),
-		End:  getEnd(req.GetType()),
+		Name:  req.GetName(),
+		Type:  req.GetType(),
+		Start: req.GetStart(),
+		End:   getEnd(req.GetEnd(), req.GetType()),
 	})
 
 	return &pb.AddBudgetResponse{}, s.save(ctx, config)
 }
 
-func getEnd(ty pb.BudgetType) int64 {
+func getEnd(val int64, ty pb.BudgetType) int64 {
+	if val > 0 {
+		return val
+	}
 	if ty == pb.BudgetType_YEARLY {
 		return time.Date(time.Now().Year(), time.December, 31, 23, 59, 59, 0, time.Now().Location()).Unix()
 	}

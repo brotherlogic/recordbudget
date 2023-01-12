@@ -124,20 +124,20 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return fmt.Errorf("This record (%v) has no matchable budget", iid)
 	}
 
-	found := true
+	found := false
 	for _, budget := range config.GetBudgets() {
 		if budget.GetName() == r.GetMetadata().GetPurchaseBudget() {
 			found = true
 
 			pdate := time.Unix(r.GetMetadata().GetDateAdded(), 0)
 			if time.Unix(budget.Start, 0).After(pdate) || time.Unix(budget.End, 0).Before(pdate) {
-				return fmt.Errorf("Budget %v does not apply to this record %v", budget.GetName(), iid)
+				return fmt.Errorf("Budget %v does not apply to this record %v (%v)", budget.GetName(), iid, r.GetMetadata().GetPurchaseBudget())
 			}
 		}
 	}
 
 	if !found {
-		return fmt.Errorf("Did not find a matching budget for this record: %v", iid)
+		return fmt.Errorf("Did not find a matching budget for this record: %v (Budget: %v, %v)", iid, r.GetMetadata().GetPurchaseBudget(), config.GetBudgets())
 	}
 
 	if err != nil {

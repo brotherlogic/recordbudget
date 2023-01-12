@@ -42,7 +42,10 @@ func (t *trc) getRecord(ctx context.Context, instanceID int32) (*rcpb.Record, er
 		return nil, fmt.Errorf("Built to fail")
 	}
 	if instanceID == 123 {
-		return &rcpb.Record{Release: &gdpb.Release{Id: 12}, Metadata: &rcpb.ReleaseMetadata{PurchaseBudget: "float"}}, nil
+		return &rcpb.Record{Release: &gdpb.Release{Id: 12}, Metadata: &rcpb.ReleaseMetadata{PurchaseBudget: "test", DateAdded: time.Now().Unix()}}, nil
+	}
+	if instanceID == 124 {
+		return &rcpb.Record{Release: &gdpb.Release{Id: 14}, Metadata: &rcpb.ReleaseMetadata{PurchaseBudget: "test", DateAdded: time.Now().Unix()}}, nil
 	}
 	return &rcpb.Record{Release: &gdpb.Release{Id: 12}}, nil
 }
