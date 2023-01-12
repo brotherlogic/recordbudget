@@ -19,7 +19,7 @@ var (
 	budgets = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_budgets",
 		Help: "The amount of potential salve value",
-	}, []string{"budget"})
+	}, []string{"budget", "active"})
 	spent = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_spent",
 		Help: "Total amount spent",
@@ -28,10 +28,14 @@ var (
 
 func (s *Server) metrics(c *pb.Config) {
 	for _, budget := range c.GetBudgets() {
+		active := "no"
+		if time.Unix(budget.GetStart(), 0).Before(time.Now()) && time.Unix(budget.GetEnd(), 0).After(time.Now()) {
+			active = "yes"
+		}
 		if budget.GetType() == pb.BudgetType_INFINITE {
-			budgets.With(prometheus.Labels{"budget": budget.GetName()}).Set(float64(5000))
+			budgets.With(prometheus.Labels{"budget": budget.GetName(), "active": active}).Set(float64(5000))
 		} else {
-			budgets.With(prometheus.Labels{"budget": budget.GetName()}).Set(float64(budget.GetRemaining()))
+			budgets.With(prometheus.Labels{"budget": budget.GetName(), "active": active}).Set(float64(budget.GetRemaining()))
 		}
 	}
 
