@@ -134,6 +134,9 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 			found = true
 
 			pdate := time.Unix(r.GetMetadata().GetDateAdded(), 0)
+			if r.GetMetadata().GetAccountingYear() > 0 && r.GetMetadata().GetAccountingYear() != int32(pdate.Year()) {
+				pdate = time.Date(int(r.GetMetadata().GetAccountingYear()), pdate.Month(), pdate.Day(), pdate.Hour(), pdate.Minute(), pdate.Second(), pdate.Nanosecond(), pdate.Location())
+			}
 			if time.Unix(budget.Start, 0).After(pdate) || time.Unix(budget.End, 0).Before(pdate) {
 				return fmt.Errorf("Budget %v does not apply to this record %v (%v)", budget.GetName(), iid, r.GetMetadata().GetPurchaseBudget())
 			}
