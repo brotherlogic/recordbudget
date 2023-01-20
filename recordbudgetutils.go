@@ -124,6 +124,9 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	r, err := s.rc.getRecord(ctx, iid)
+	if err != nil {
+		return err
+	}
 	if r.GetMetadata().GetPurchaseBudget() == "" {
 		return fmt.Errorf("This record (%v) has no matchable budget", iid)
 	}
