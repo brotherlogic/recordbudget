@@ -125,6 +125,10 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 
 	r, err := s.rc.getRecord(ctx, iid)
 	if err != nil {
+		//Ignore deleted record
+		if status.Code(err) == codes.OutOfRange {
+			return nil
+		}
 		return err
 	}
 	if r.GetMetadata().GetPurchaseBudget() == "" {
