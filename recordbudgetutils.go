@@ -132,7 +132,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 	if r.GetMetadata().GetPurchaseBudget() == "" {
-		return fmt.Errorf("This record (%v) has no matchable budget", iid)
+		return status.Errorf(codes.DataLoss, "This record (%v) has no matchable budget", iid)
 	}
 
 	found := false
