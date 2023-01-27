@@ -133,8 +133,11 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	// All records after 2023 should have a budget
-	if r.GetMetadata().GetPurchaseBudget() == "" && time.Unix(r.GetMetadata().GetDateAdded(), 0).Year() >= 2023 {
-		return status.Errorf(codes.DataLoss, "This record (%v) has no matchable budget", iid)
+	if r.GetMetadata().GetPurchaseBudget() == "" {
+		if time.Unix(r.GetMetadata().GetDateAdded(), 0).Year() >= 2023 {
+			return status.Errorf(codes.DataLoss, "This record (%v) has no matchable budget", iid)
+		}
+		return nil
 	}
 
 	found := false
