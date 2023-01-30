@@ -51,6 +51,43 @@ func main() {
 	client := pb.NewRecordBudgetServiceClient(conn)
 
 	switch os.Args[1] {
+	case "boosey":
+		_, err := client.AddBudget(ctx, &pb.AddBudgetRequest{
+			Name:  "Boosey",
+			Start: time.Date(2022, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+			End:   time.Date(2023, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+		})
+		if err != nil {
+			log.Fatalf("Bad add: %v", err)
+		}
+	case "the_fall":
+		_, err := client.AddBudget(ctx, &pb.AddBudgetRequest{
+			Name:  "the_fall",
+			Start: time.Date(1980, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+			End:   time.Date(2029, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+			Type:  pb.BudgetType_INFINITE,
+		})
+		if err != nil {
+			log.Fatalf("Bad add: %v", err)
+		}
+	case "digital":
+		_, err := client.AddBudget(ctx, &pb.AddBudgetRequest{
+			Name:  "digital",
+			Start: time.Date(1980, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+			End:   time.Date(2023, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+		})
+		if err != nil {
+			log.Fatalf("Bad add: %v", err)
+		}
+	case "2022":
+		_, err := client.AddBudget(ctx, &pb.AddBudgetRequest{
+			Name:  "2022",
+			Start: time.Date(2022, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+			End:   time.Date(2023, time.January, 1, 0, 0, 0, 0, time.Now().Location()).Unix(),
+		})
+		if err != nil {
+			log.Fatalf("Bad add: %v", err)
+		}
 	case "add":
 		addFlags := flag.NewFlagSet("add", flag.ExitOnError)
 		var name = addFlags.String("name", "", "The name of the budget")
