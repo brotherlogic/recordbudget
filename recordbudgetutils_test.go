@@ -8,7 +8,7 @@ import (
 	keystoreclient "github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 
-	gdpb "github.com/brotherlogic/godiscogs"
+	gdpb "github.com/brotherlogic/godiscogs/proto"
 	rapb "github.com/brotherlogic/recordadder/proto"
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"

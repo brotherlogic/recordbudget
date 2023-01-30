@@ -43,7 +43,7 @@ message Budget {
 
 message Order {
   string order_id = 1;
-   int32 listing_id = 2;
+   int64 listing_id = 2;
   int64 sale_date = 3;
   int32 sale_price = 4;
 }
