@@ -75,7 +75,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			if config.Tracking == 0 {
-				num, err := s.ImmediateIssue(ctx, "Incomplete Order Alert", fmt.Sprintf("Order %v needs completion: https://www.discogs.com/sell/order/150295-%v", config.LastOrderPull, config.LastOrderPull), true)
+				num, err := s.ImmediateIssue(ctx, "Incomplete Order Alert", fmt.Sprintf("Order %v needs completion: https://www.discogs.com/sell/order/150295-%v", config.LastOrderPull, config.LastOrderPull), true, true)
 				if err != nil {
 					return nil, err
 				}
