@@ -8,15 +8,10 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver/utils"
-	"google.golang.org/grpc/resolver"
 
 	pb "github.com/brotherlogic/recordbudget/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
-
-func init() {
-	resolver.Register(&utils.DiscoveryClientResolverBuilder{})
-}
 
 func getRecord(i int32) (int32, string) {
 	ctx, cancel := utils.BuildContext("recordbudget-cli", "recordbudget")
