@@ -13,7 +13,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/resolver"
 
 	gdpb "github.com/brotherlogic/godiscogs/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
@@ -28,10 +27,6 @@ var (
 		Help: "The size of the print queue",
 	})
 )
-
-func init() {
-	resolver.Register(&utils.DiscoveryServerResolverBuilder{})
-}
 
 const (
 	// CONFIG storage key
