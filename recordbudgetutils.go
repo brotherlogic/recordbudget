@@ -46,7 +46,7 @@ func (s *Server) metrics(c *pb.Config) {
 		yearSpend[year] += spent.GetCost()
 	}
 	for year, spend := range yearSpend {
-		spent.With(prometheus.Labels{"year": year}).Set(float64(spend) / 100.0)
+		spent.With(prometheus.Labels{"year": year}).Set(float64(spend))
 	}
 }
 
