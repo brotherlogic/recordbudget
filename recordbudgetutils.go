@@ -21,6 +21,14 @@ var (
 		Name: "recordbudget_budgets",
 		Help: "The amount of potential salve value",
 	}, []string{"budget", "active"})
+	outlay = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "recordbudget_outlay",
+		Help: "The amount of potential salve value",
+	}, []string{"budget", "active"})
+	made = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_made",
+		Help: "The amount of potential salve value",
+	})
 	spent = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_spent",
 		Help: "Total amount spent",
@@ -38,6 +46,12 @@ func (s *Server) metrics(c *pb.Config) {
 		} else {
 			budgets.With(prometheus.Labels{"budget": budget.GetName(), "active": active}).Set(float64(budget.GetRemaining()))
 		}
+
+		spent := float64(0)
+		for _, spend := range budget.GetSpends() {
+			spent += float64(spend)
+		}
+		outlay.With(prometheus.Labels{"budget": budget.GetName()}).Set(spent)
 	}
 
 	yearSpend := make(map[string]int32)
@@ -48,6 +62,14 @@ func (s *Server) metrics(c *pb.Config) {
 	for year, spend := range yearSpend {
 		spent.With(prometheus.Labels{"year": year}).Set(float64(spend) / 100.0)
 	}
+
+	madev := float64(0)
+	for _, sold := range c.GetSolds() {
+		if time.Unix(sold.GetSoldDate(), 0).Year() == time.Now().Year() {
+			madev += float64(sold.GetPrice())
+		}
+	}
+	made.Set(madev)
 }
 
 func (s *Server) adjustDate(ctx context.Context, r *rcpb.Record) int64 {
