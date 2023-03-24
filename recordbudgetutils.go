@@ -21,6 +21,10 @@ var (
 		Name: "recordbudget_budgets",
 		Help: "The amount of potential salve value",
 	}, []string{"budget", "active"})
+	outlay = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "recordbudget_outlay",
+		Help: "The amount of potential salve value",
+	}, []string{"budget", "active"})
 	spent = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_spent",
 		Help: "Total amount spent",
@@ -38,6 +42,12 @@ func (s *Server) metrics(c *pb.Config) {
 		} else {
 			budgets.With(prometheus.Labels{"budget": budget.GetName(), "active": active}).Set(float64(budget.GetRemaining()))
 		}
+
+		spent := float64(0)
+		for _, spend := range budget.GetSpends() {
+			spent += float64(spend)
+		}
+		outlay.With(prometheus.Labels{"budget": budget.GetName()}).Set(spent)
 	}
 
 	yearSpend := make(map[string]int32)
