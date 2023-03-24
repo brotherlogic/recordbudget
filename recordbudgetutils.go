@@ -24,7 +24,7 @@ var (
 	outlay = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_outlay",
 		Help: "The amount of potential salve value",
-	}, []string{"budget", "active"})
+	}, []string{"budget"})
 	made = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "recordbudget_made",
 		Help: "The amount of potential salve value",
