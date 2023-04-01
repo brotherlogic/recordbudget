@@ -65,7 +65,7 @@ func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 
 	madev := float64(0)
 	for i, sold := range c.GetSolds() {
-		s.CtxLog(ctx, fmt.Sprintf("Made: %v", i))
+		s.CtxLog(ctx, fmt.Sprintf("Made: %v -> %v", i, sold))
 		if time.Unix(sold.GetSoldDate(), 0).Year() == time.Now().Year() {
 			madev += float64(sold.GetPrice())
 		}
