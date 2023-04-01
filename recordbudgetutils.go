@@ -167,6 +167,8 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		for _, rec := range config.GetSolds() {
 			if rec.GetInstanceId() != r.GetRelease().GetInstanceId() {
 				nsolds = append(nsolds, rec)
+			} else {
+				s.CtxLog(ctx, fmt.Sprintf("Dropping %v", rec))
 			}
 		}
 		config.Solds = nsolds
