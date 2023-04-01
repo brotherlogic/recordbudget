@@ -35,7 +35,7 @@ var (
 	}, []string{"year"})
 )
 
-func (s *Server) metrics(c *pb.Config) {
+func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 	for _, budget := range c.GetBudgets() {
 		active := "no"
 		if time.Unix(budget.GetStart(), 0).Before(time.Now()) && time.Unix(budget.GetEnd(), 0).After(time.Now()) {
@@ -64,7 +64,8 @@ func (s *Server) metrics(c *pb.Config) {
 	}
 
 	madev := float64(0)
-	for _, sold := range c.GetSolds() {
+	for i, sold := range c.GetSolds() {
+		s.CtxLog(ctx, fmt.Sprintf("Made: %v", i))
 		if time.Unix(sold.GetSoldDate(), 0).Year() == time.Now().Year() {
 			madev += float64(sold.GetPrice())
 		}
