@@ -161,6 +161,17 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 
+	// Remove sold record if this record has been relisted
+	if r.GetMetadata().GetSaleState() == pbgd.SaleState_FOR_SALE {
+		var nsolds []*pb.SoldRecord
+		for _, rec := range config.GetSolds() {
+			if rec.GetInstanceId() != r.GetRelease().GetInstanceId() {
+				nsolds = append(nsolds, rec)
+			}
+		}
+		config.Solds = nsolds
+	}
+
 	// All records after 2023 should have a budget
 	if r.GetMetadata().GetPurchaseBudget() == "" {
 		if time.Unix(r.GetMetadata().GetDateAdded(), 0).Year() >= 2023 {
@@ -289,17 +300,6 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	config.Purchases = append(config.Purchases, &pb.BoughtRecord{InstanceId: iid, Cost: r.GetMetadata().GetCost(), BoughtDate: dateAdded})
-
-	// Remove sold record if this record has been relisted
-	if r.GetMetadata().GetSaleState() == pbgd.SaleState_FOR_SALE {
-		var nsolds []*pb.SoldRecord
-		for _, rec := range config.GetSolds() {
-			if rec.GetInstanceId() != r.GetRelease().GetInstanceId() {
-				nsolds = append(nsolds, rec)
-			}
-		}
-		config.Solds = nsolds
-	}
 
 	return s.save(ctx, config)
 }
