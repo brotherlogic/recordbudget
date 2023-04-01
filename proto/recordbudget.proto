@@ -11,6 +11,7 @@ message Config {
   repeated SoldRecord solds = 4;
 
   int32 last_order_pull = 6;
+  int32 rotate_order_pull = 10;
   repeated Order orders = 5;
   int64 last_order_pull_date = 7;
 
@@ -46,6 +47,8 @@ message Order {
    int64 listing_id = 2;
   int64 sale_date = 3;
   int32 sale_price = 4;
+  bool cancelled = 5;
+  
 }
 
 message BoughtRecord {

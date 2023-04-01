@@ -33,6 +33,10 @@ var (
 		Name: "recordbudget_spent",
 		Help: "Total amount spent",
 	}, []string{"year"})
+	rotateOrder = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_rotate_order",
+		Help: "The amount of potential salve value",
+	})
 )
 
 func (s *Server) metrics(ctx context.Context, c *pb.Config) {
@@ -285,6 +289,17 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	config.Purchases = append(config.Purchases, &pb.BoughtRecord{InstanceId: iid, Cost: r.GetMetadata().GetCost(), BoughtDate: dateAdded})
+
+	// Remove sold record if this record has been relisted
+	if r.GetMetadata().GetSaleState() == pbgd.SaleState_FOR_SALE {
+		var nsolds []*pb.SoldRecord
+		for _, rec := range config.GetSolds() {
+			if rec.GetInstanceId() != r.GetRelease().GetInstanceId() {
+				nsolds = append(nsolds, rec)
+			}
+		}
+		config.Solds = nsolds
+	}
 
 	return s.save(ctx, config)
 }
