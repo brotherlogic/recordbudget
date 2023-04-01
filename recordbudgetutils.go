@@ -172,6 +172,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 			}
 		}
 		config.Solds = nsolds
+		s.save(ctx, config)
 	}
 
 	// All records after 2023 should have a budget
