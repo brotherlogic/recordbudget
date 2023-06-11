@@ -64,7 +64,7 @@ func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 		yearSpend[year] += spent.GetCost()
 	}
 	for year, spend := range yearSpend {
-		spent.With(prometheus.Labels{"year": year}).Set(float64(spend) / 100.0)
+		spent.With(prometheus.Labels{"year": year}).Set(float64(spend))
 	}
 
 	madev := float64(0)
@@ -113,6 +113,13 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 		}
 		if status.Convert(err).Code() == codes.NotFound {
 			//Just silently ignore this - and keep moving
+			return config, nil
+		}
+		if status.Convert(err).Code() == codes.DataLoss {
+			// The order has been cancelled
+			s.DeleteIssue(ctx, config.GetTracking())
+			config.Tracking = 0
+			config.LastOrderPull++
 			return config, nil
 		}
 
