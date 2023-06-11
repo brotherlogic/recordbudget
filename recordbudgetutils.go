@@ -21,13 +21,25 @@ var (
 		Name: "recordbudget_budgets",
 		Help: "The amount of potential salve value",
 	}, []string{"budget", "active"})
+	outlay = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "recordbudget_outlay",
+		Help: "The amount of potential salve value",
+	}, []string{"budget"})
+	made = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_made",
+		Help: "The amount of potential salve value",
+	})
 	spent = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_spent",
 		Help: "Total amount spent",
 	}, []string{"year"})
+	rotateOrder = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_rotate_order",
+		Help: "The amount of potential salve value",
+	})
 )
 
-func (s *Server) metrics(c *pb.Config) {
+func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 	for _, budget := range c.GetBudgets() {
 		active := "no"
 		if time.Unix(budget.GetStart(), 0).Before(time.Now()) && time.Unix(budget.GetEnd(), 0).After(time.Now()) {
@@ -38,6 +50,12 @@ func (s *Server) metrics(c *pb.Config) {
 		} else {
 			budgets.With(prometheus.Labels{"budget": budget.GetName(), "active": active}).Set(float64(budget.GetRemaining()))
 		}
+
+		spent := float64(0)
+		for _, spend := range budget.GetSpends() {
+			spent += float64(spend)
+		}
+		outlay.With(prometheus.Labels{"budget": budget.GetName()}).Set(spent)
 	}
 
 	yearSpend := make(map[string]int32)
@@ -48,6 +66,16 @@ func (s *Server) metrics(c *pb.Config) {
 	for year, spend := range yearSpend {
 		spent.With(prometheus.Labels{"year": year}).Set(float64(spend))
 	}
+
+	madev := float64(0)
+	for i, sold := range c.GetSolds() {
+		if time.Unix(sold.GetSoldDate(), 0).Year() == time.Now().Year() {
+			s.CtxLog(ctx, fmt.Sprintf("Made: %v -> %v", i, sold))
+
+			madev += float64(sold.GetPrice())
+		}
+	}
+	made.Set(madev)
 }
 
 func (s *Server) adjustDate(ctx context.Context, r *rcpb.Record) int64 {
@@ -131,6 +159,20 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 			return nil
 		}
 		return err
+	}
+
+	// Remove sold record if this record has been relisted
+	if r.GetMetadata().GetSaleState() == pbgd.SaleState_FOR_SALE {
+		var nsolds []*pb.SoldRecord
+		for _, rec := range config.GetSolds() {
+			if rec.GetInstanceId() != r.GetRelease().GetInstanceId() {
+				nsolds = append(nsolds, rec)
+			} else {
+				s.CtxLog(ctx, fmt.Sprintf("Dropping %v", rec))
+			}
+		}
+		config.Solds = nsolds
+		s.save(ctx, config)
 	}
 
 	// All records after 2023 should have a budget

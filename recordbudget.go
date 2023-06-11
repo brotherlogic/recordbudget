@@ -185,7 +185,7 @@ func (s *Server) load(ctx context.Context) (*pb.Config, error) {
 	orderCount.Set(float64(len(config.Orders)))
 
 	s.updateBudgets(config)
-	s.metrics(config)
+	s.metrics(ctx, config)
 
 	for _, budget := range config.Budgets {
 		if budget.GetName() == "digital" {
@@ -212,7 +212,7 @@ func (s *Server) save(ctx context.Context, config *pb.Config) error {
 		return err
 	}
 
-	s.metrics(config)
+	s.metrics(ctx, config)
 	return err
 }
 
