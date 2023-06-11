@@ -115,6 +115,13 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 			//Just silently ignore this - and keep moving
 			return config, nil
 		}
+		if status.Convert(err).Code() == codes.DataLoss {
+			// The order has been cancelled
+			s.DeleteIssue(ctx, config.GetTracking())
+			config.Tracking = 0
+			config.LastOrderPull++
+			return config, nil
+		}
 
 		return nil, err
 	}
