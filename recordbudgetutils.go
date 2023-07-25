@@ -240,7 +240,9 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		}
 
 		if r.GetMetadata().GetCategory() == rcpb.ReleaseMetadata_SOLD_ARCHIVE && r.GetMetadata().GetSaleState() != pbgd.SaleState_SOLD_OFFLINE {
-			s.RaiseIssue(fmt.Sprintf("A Difficult Sale for %v", iid), fmt.Sprintf("%v has a sale id but no related order - see https://www.discogs.com/madeup/release/%v", iid, r.GetRelease().GetId()))
+			if time.Since(time.Unix(r.GetMetadata().GetLastUpdateTime(), 0)) > time.Hour*24*3 {
+				s.RaiseIssue(fmt.Sprintf("A Difficult Sale for %v", iid), fmt.Sprintf("%v has a sale id but no related order - see https://www.discogs.com/madeup/release/%v", iid, r.GetRelease().GetId()))
+			}
 		}
 	}
 
