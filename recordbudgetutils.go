@@ -29,6 +29,10 @@ var (
 		Name: "recordbudget_made",
 		Help: "The amount of potential salve value",
 	})
+	was_parents_made = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_parents_made",
+		Help: "The amount of potential salve value",
+	})
 	spent = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_spent",
 		Help: "Total amount spent",
@@ -73,6 +77,12 @@ func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 			s.CtxLog(ctx, fmt.Sprintf("Made: %v -> %v", i, sold))
 
 			madev += float64(sold.GetPrice())
+		}
+	}
+	madep := float64(0)
+	for _, sold := range c.GetSolds() {
+		if sold.GetWasParents() {
+			madep += float64(sold.GetPrice())
 		}
 	}
 	made.Set(madev)
@@ -168,6 +178,15 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		return err
 	}
 
+	if r.GetMetadata().GetWasParents() {
+		for _, c := range config.GetSolds() {
+			if c.GetInstanceId() == r.GetRelease().GetInstanceId() && !c.GetWasParents() {
+				c.WasParents = true
+				return s.save(ctx, config)
+			}
+		}
+	}
+
 	// Remove sold record if this record has been relisted
 	if r.GetMetadata().GetSaleState() == pbgd.SaleState_FOR_SALE {
 		var nsolds []*pb.SoldRecord
@@ -251,6 +270,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 			if r.GetMetadata().GetSoldPrice() > 0 {
 				re.Price = r.GetMetadata().GetSoldPrice()
 				re.SoldDate = r.GetMetadata().GetSoldDate()
+				re.WasParents = r.GetMetadata().GetWasParents()
 				return s.save(ctx, config)
 			}
 			return nil
