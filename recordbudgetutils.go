@@ -85,7 +85,7 @@ func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 			madep += float64(sold.GetPrice())
 		}
 	}
-	was_parents_made.Set(madev)
+	was_parents_made.Set(madep)
 }
 
 func (s *Server) adjustDate(ctx context.Context, r *rcpb.Record) int64 {
