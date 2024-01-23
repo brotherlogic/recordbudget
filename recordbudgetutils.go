@@ -227,7 +227,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	if !found {
-		return status.Errorf(codes.DataLoss, "Did not find a matching budget for this record: %v (Budget: %v)", iid, r.GetMetadata().GetPurchaseBudget())
+		r.GetMetadata().PurchaseBudget = "float2023"
 	}
 
 	if err != nil {
