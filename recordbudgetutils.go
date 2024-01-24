@@ -86,6 +86,7 @@ func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 		}
 	}
 	was_parents_made.Set(madep)
+	made.Set(madev)
 }
 
 func (s *Server) adjustDate(ctx context.Context, r *rcpb.Record) int64 {
