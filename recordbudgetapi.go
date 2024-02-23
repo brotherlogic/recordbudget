@@ -93,6 +93,14 @@ func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest
 	return &rcpb.ClientUpdateResponse{}, s.processRec(ctx, req.GetInstanceId())
 }
 
+func (s *Server) GetOrders(ctx context.Context, req *pb.GetOrdersRequest) (*pb.GetOrdersResponse, error) {
+	config, err := s.load(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GetOrdersResponse{Orders: config.GetOrders()}, nil
+}
+
 func (s *Server) GetSold(ctx context.Context, req *pb.GetSoldRequest) (*pb.GetSoldResponse, error) {
 	config, err := s.load(ctx)
 	if err != nil {

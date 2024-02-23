@@ -170,9 +170,19 @@ func main() {
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			}
+			fmt.Printf("Got %v sales\n", len(res.GetRecord()))
 			for _, r := range res.GetRecord() {
-				fmt.Printf("%v - %v\n", r.GetPrice(), time.Unix(r.SoldDate, 0), err)
+				fmt.Printf("%v - %v %v\n", r.GetPrice(), r.GetInstanceId(), time.Unix(r.SoldDate, 0))
 			}
+		}
+	case "orders":
+		res, err := client.GetOrders(ctx, &pb.GetOrdersRequest{})
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+		fmt.Printf("Got %v orders\n", len(res.GetOrders()))
+		for _, o := range res.GetOrders() {
+			fmt.Printf("%v - %v\n", o.GetOrderId(), o.GetListingId())
 		}
 	case "budget":
 		res, err := client.GetBudget(ctx, &pb.GetBudgetRequest{Year: int32(time.Now().Year())})

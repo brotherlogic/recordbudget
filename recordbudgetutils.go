@@ -228,7 +228,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	if !found {
-		r.GetMetadata().PurchaseBudget = "float2023"
+		r.GetMetadata().PurchaseBudget = "float2024"
 	}
 
 	if err != nil {
@@ -247,7 +247,6 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	// See if we've got an confirmed order for this
-
 	if r.GetMetadata().GetSoldDate() == 0 && r.GetMetadata().GetSaleId() > 0 {
 		for _, order := range config.GetOrders() {
 			if order.GetListingId() == r.GetMetadata().GetSaleId() {

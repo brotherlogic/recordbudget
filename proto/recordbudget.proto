@@ -125,4 +125,10 @@ service RecordBudgetService {
   rpc SeedBudget(SeedBudgetRequest) returns (SeedBudgetResponse) {};
   rpc GetBudget(GetBudgetRequest) returns (GetBudgetResponse) {};
   rpc GetSold(GetSoldRequest) returns (GetSoldResponse) {};
+  rpc GetOrders(GetOrdersRequest) returns (GetOrdersResponse) {};
+}
+
+message GetOrdersRequest {}
+message GetOrdersResponse{
+  repeated Order orders = 1;
 }
