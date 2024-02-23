@@ -100,7 +100,7 @@ func (s *Server) GetSold(ctx context.Context, req *pb.GetSoldRequest) (*pb.GetSo
 	}
 
 	for _, sold := range config.GetSolds() {
-		if sold.GetInstanceId() == req.GetInstanceId() {
+		if req.GetInstanceId() == 0 && sold.GetInstanceId() == req.GetInstanceId() {
 			return &pb.GetSoldResponse{Record: sold}, nil
 		}
 	}

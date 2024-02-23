@@ -167,7 +167,7 @@ func main() {
 		var id = soldFlags.Int("id", -1, "Id of the record to add")
 		if err := soldFlags.Parse(os.Args[2:]); err == nil {
 			res, err := client.GetSold(ctx, &pb.GetSoldRequest{InstanceId: int32(*id)})
-			fmt.Printf("%v and %v\n", res, err)
+			fmt.Printf("%v - %v\n", res.Record.GetPrice(), time.Unix(res.GetRecord().SoldDate, 0), err)
 		}
 	case "budget":
 		res, err := client.GetBudget(ctx, &pb.GetBudgetRequest{Year: int32(time.Now().Year())})
