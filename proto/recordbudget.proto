@@ -97,7 +97,7 @@ message GetSoldRequest{
 }
 
 message GetSoldResponse {
-  SoldRecord record = 1;
+  repeated SoldRecord record = 1;
 }
 
 message AddBudgetRequest {
