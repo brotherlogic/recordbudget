@@ -26,6 +26,7 @@ type RecordBudgetServiceClient interface {
 	SeedBudget(ctx context.Context, in *SeedBudgetRequest, opts ...grpc.CallOption) (*SeedBudgetResponse, error)
 	GetBudget(ctx context.Context, in *GetBudgetRequest, opts ...grpc.CallOption) (*GetBudgetResponse, error)
 	GetSold(ctx context.Context, in *GetSoldRequest, opts ...grpc.CallOption) (*GetSoldResponse, error)
+	GetOrders(ctx context.Context, in *GetOrdersRequest, opts ...grpc.CallOption) (*GetOrdersResponse, error)
 }
 
 type recordBudgetServiceClient struct {
@@ -72,6 +73,15 @@ func (c *recordBudgetServiceClient) GetSold(ctx context.Context, in *GetSoldRequ
 	return out, nil
 }
 
+func (c *recordBudgetServiceClient) GetOrders(ctx context.Context, in *GetOrdersRequest, opts ...grpc.CallOption) (*GetOrdersResponse, error) {
+	out := new(GetOrdersResponse)
+	err := c.cc.Invoke(ctx, "/recordbudget.RecordBudgetService/GetOrders", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RecordBudgetServiceServer is the server API for RecordBudgetService service.
 // All implementations should embed UnimplementedRecordBudgetServiceServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type RecordBudgetServiceServer interface {
 	SeedBudget(context.Context, *SeedBudgetRequest) (*SeedBudgetResponse, error)
 	GetBudget(context.Context, *GetBudgetRequest) (*GetBudgetResponse, error)
 	GetSold(context.Context, *GetSoldRequest) (*GetSoldResponse, error)
+	GetOrders(context.Context, *GetOrdersRequest) (*GetOrdersResponse, error)
 }
 
 // UnimplementedRecordBudgetServiceServer should be embedded to have forward compatible implementations.
@@ -97,6 +108,9 @@ func (UnimplementedRecordBudgetServiceServer) GetBudget(context.Context, *GetBud
 }
 func (UnimplementedRecordBudgetServiceServer) GetSold(context.Context, *GetSoldRequest) (*GetSoldResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSold not implemented")
+}
+func (UnimplementedRecordBudgetServiceServer) GetOrders(context.Context, *GetOrdersRequest) (*GetOrdersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrders not implemented")
 }
 
 // UnsafeRecordBudgetServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -182,6 +196,24 @@ func _RecordBudgetService_GetSold_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RecordBudgetService_GetOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrdersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RecordBudgetServiceServer).GetOrders(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/recordbudget.RecordBudgetService/GetOrders",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RecordBudgetServiceServer).GetOrders(ctx, req.(*GetOrdersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RecordBudgetService_ServiceDesc is the grpc.ServiceDesc for RecordBudgetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +236,10 @@ var RecordBudgetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSold",
 			Handler:    _RecordBudgetService_GetSold_Handler,
+		},
+		{
+			MethodName: "GetOrders",
+			Handler:    _RecordBudgetService_GetOrders_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
