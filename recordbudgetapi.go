@@ -99,13 +99,14 @@ func (s *Server) GetSold(ctx context.Context, req *pb.GetSoldRequest) (*pb.GetSo
 		return nil, err
 	}
 
+	var solds []*pb.SoldRecord
 	for _, sold := range config.GetSolds() {
 		if req.GetInstanceId() == 0 && sold.GetInstanceId() == req.GetInstanceId() {
-			return &pb.GetSoldResponse{Record: sold}, nil
+			solds = append(solds, sold)
 		}
 	}
 
-	return nil, status.Errorf(codes.NotFound, "Unable to locate %v", req.GetInstanceId())
+	return &pb.GetSoldResponse{Record: solds}, nil
 }
 
 func (s *Server) AddBudget(ctx context.Context, req *pb.AddBudgetRequest) (*pb.AddBudgetResponse, error) {
