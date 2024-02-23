@@ -174,6 +174,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	if err != nil {
 		//Ignore deleted record
 		if status.Code(err) == codes.OutOfRange {
+			s.CtxLog(ctx, "Found out of range")
 			return nil
 		}
 		return err
@@ -183,6 +184,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		for _, c := range config.GetSolds() {
 			if c.GetInstanceId() == r.GetRelease().GetInstanceId() && !c.GetWasParents() {
 				c.WasParents = true
+				s.CtxLog(ctx, "Short cut save on parents")
 				return s.save(ctx, config)
 			}
 		}
@@ -208,6 +210,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 			return status.Errorf(codes.DataLoss, "This record (%v) has no matchable budget", iid)
 		}
 		if r.GetMetadata().GetCategory() != rcpb.ReleaseMetadata_SOLD_ARCHIVE || r.GetMetadata().GetSoldPrice() > 0 {
+			s.CtxLog(ctx, fmt.Sprintf("Budget Metadata"))
 			return nil
 		}
 	}
@@ -240,6 +243,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 				}
 			}
 			config.Purchases = pc
+			s.CtxLog(ctx, "Out of Range save")
 			return s.save(ctx, config)
 		}
 
@@ -273,6 +277,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 				re.WasParents = r.GetMetadata().GetWasParents()
 				return s.save(ctx, config)
 			}
+			s.CtxLog(ctx, "Record has no sold price")
 			return nil
 		}
 	}
@@ -309,11 +314,11 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 				return s.save(ctx, config)
 			}
 		}
-
 	}
 
 	for _, re := range config.GetPurchases() {
 		if re.GetInstanceId() == iid {
+			s.CtxLog(ctx, "Found purchase")
 			if re.GetBudget() != r.GetMetadata().GetPurchaseBudget() {
 				re.Budget = r.GetMetadata().GetPurchaseBudget()
 				return s.save(ctx, config)
@@ -333,6 +338,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 
 	config.Purchases = append(config.Purchases, &pb.BoughtRecord{InstanceId: iid, Cost: r.GetMetadata().GetCost(), BoughtDate: dateAdded})
 
+	s.CtxLog(ctx, "Reached the end")
 	return s.save(ctx, config)
 }
 
