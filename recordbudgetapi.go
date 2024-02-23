@@ -101,7 +101,7 @@ func (s *Server) GetSold(ctx context.Context, req *pb.GetSoldRequest) (*pb.GetSo
 
 	var solds []*pb.SoldRecord
 	for _, sold := range config.GetSolds() {
-		if req.GetInstanceId() == 0 && sold.GetInstanceId() == req.GetInstanceId() {
+		if req.GetInstanceId() == 0 || sold.GetInstanceId() == req.GetInstanceId() {
 			solds = append(solds, sold)
 		}
 	}
