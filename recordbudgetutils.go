@@ -131,6 +131,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 			s.DeleteIssue(ctx, config.GetTracking())
 			config.Tracking = 0
 			config.LastOrderPull++
+
 			return config, nil
 		}
 
@@ -150,6 +151,17 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 			SalePrice: price,
 		})
 		lastListing.Set(float64(id))
+
+		conn, err := s.FDialServer(ctx, "recordcollection")
+		if err != nil {
+			return nil, err
+		}
+		rcclient := rcpb.NewRecordCollectionServiceClient(conn)
+		rcclient.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Update: &rcpb.Record{
+			Metadata: &rcpb.ReleaseMetadata{
+				SaleId: id,
+			},
+		}})
 	}
 	config.LastOrderPull++
 
@@ -210,7 +222,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 			return status.Errorf(codes.DataLoss, "This record (%v) has no matchable budget", iid)
 		}
 		if r.GetMetadata().GetCategory() != rcpb.ReleaseMetadata_SOLD_ARCHIVE || r.GetMetadata().GetSoldPrice() > 0 {
-			r.GetMetadata().PurchaseBudget = "float2024"
+			r.GetMetadata().PurchaseBudget = "float20241`1zxsa"
 		}
 	}
 
