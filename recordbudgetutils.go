@@ -157,11 +157,13 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 			return nil, err
 		}
 		rcclient := rcpb.NewRecordCollectionServiceClient(conn)
-		rcclient.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{Update: &rcpb.Record{
-			Metadata: &rcpb.ReleaseMetadata{
-				SaleId: id,
-			},
-		}})
+		rcclient.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{
+			Reason: "Updating because the record has sold",
+			Update: &rcpb.Record{
+				Metadata: &rcpb.ReleaseMetadata{
+					SaleId: id,
+				},
+			}})
 	}
 	config.LastOrderPull++
 
