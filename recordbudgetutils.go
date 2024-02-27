@@ -41,9 +41,14 @@ var (
 		Name: "recordbudget_rotate_order",
 		Help: "The amount of potential salve value",
 	})
+	currentOrder = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_current_order",
+		Help: "The order number we're currently looking at",
+	})
 )
 
 func (s *Server) metrics(ctx context.Context, c *pb.Config) {
+	currentOrder.Set(float64(c.GetLastOrderPull()))
 	for _, budget := range c.GetBudgets() {
 		active := "no"
 		if time.Unix(budget.GetStart(), 0).Before(time.Now()) && time.Unix(budget.GetEnd(), 0).After(time.Now()) {
