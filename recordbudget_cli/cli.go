@@ -152,8 +152,9 @@ func main() {
 
 			fmt.Printf("Budget: %v [%v] [%v]\n", res.GetChosenBudget().GetName(), res.GetChosenBudget().GetType(), res.GetChosenBudget().GetSaleFed())
 			sum := int32(0)
-			for _, spend := range res.GetChosenBudget().GetSpends() {
+			for i, spend := range res.GetChosenBudget().GetSpends() {
 				sum += spend
+				fmt.Printf("%v %v\n", spend, i)
 			}
 			fmt.Printf("Spent: %v\n", sum)
 			fmt.Printf("Made: %v\n", res.GetChosenBudget().GetSolds())

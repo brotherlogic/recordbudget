@@ -235,7 +235,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 			return status.Errorf(codes.DataLoss, "This record (%v) has no matchable budget", iid)
 		}
 		if r.GetMetadata().GetCategory() != rcpb.ReleaseMetadata_SOLD_ARCHIVE || r.GetMetadata().GetSoldPrice() > 0 {
-			r.GetMetadata().PurchaseBudget = "float20241`1zxsa"
+			r.GetMetadata().PurchaseBudget = "unknown"
 		}
 	}
 
@@ -255,7 +255,7 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 	}
 
 	if !found {
-		r.GetMetadata().PurchaseBudget = "float2024"
+		r.GetMetadata().PurchaseBudget = "unknown"
 	}
 
 	if err != nil {
