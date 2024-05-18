@@ -45,10 +45,15 @@ var (
 		Name: "recordbudget_current_order",
 		Help: "The order number we're currently looking at",
 	})
+	currentOutstandingOrder = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "recordbudget_current_outstanding_order",
+		Help: "The order number we're currently looking at",
+	})
 )
 
 func (s *Server) metrics(ctx context.Context, c *pb.Config) {
 	currentOrder.Set(float64(c.GetLastOrderPull()))
+	currentOutstandingOrder.Set(float64(c.Tracking))
 	for _, budget := range c.GetBudgets() {
 		active := "no"
 		if time.Unix(budget.GetStart(), 0).Before(time.Now()) && time.Unix(budget.GetEnd(), 0).After(time.Now()) {
@@ -134,11 +139,11 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 		if status.Convert(err).Code() == codes.DataLoss {
 			// The order has been cancelled
 			if config.GetTracking() > 0 {
-			err = s.DeleteIssue(ctx, config.GetTracking())
-			if err != nil {
-				return nil, err
+				err = s.DeleteIssue(ctx, config.GetTracking())
+				if err != nil {
+					return nil, err
+				}
 			}
-		}
 			config.Tracking = 0
 			config.LastOrderPull++
 
