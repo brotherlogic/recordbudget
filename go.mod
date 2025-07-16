@@ -6,9 +6,9 @@ require (
 	github.com/brotherlogic/godiscogs v0.0.0-20250429182651-404c7473edf8
 	github.com/brotherlogic/goserver v0.0.0-20250608182006-4ace595931a5
 	github.com/brotherlogic/keystore v0.0.0-20240508161349-814b3200b126
-	github.com/brotherlogic/recordadder v0.0.0-20250716051812-636358b11359
+	github.com/brotherlogic/recordadder v0.0.0-20250716093453-29b15a48d49a
 	github.com/brotherlogic/recordcollection v0.0.0-20250715205636-bf74e659d908
-	github.com/brotherlogic/recordscores v0.0.0-20250716052453-77969322b0c7
+	github.com/brotherlogic/recordscores v0.0.0-20250716091354-bb03ad0d7c40
 	github.com/prometheus/client_golang v1.22.0
 	golang.org/x/net v0.42.0
 	google.golang.org/grpc v1.73.0
