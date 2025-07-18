@@ -26,12 +26,12 @@ github.com/brotherlogic/logging v0.0.0-20250714215612-d76512b702de h1:gjbjCr/fEF
 github.com/brotherlogic/logging v0.0.0-20250714215612-d76512b702de/go.mod h1:LqGprjgoFch8ZPtQH6/MgtAjkMbiBQi78jqsvYndhaw=
 github.com/brotherlogic/monitor v0.0.0-20221025152653-c10877c5f9e6 h1:hxu2T9JspE76sL3XAx/CNtA9bOO6QCEJkyG9rBXFEVA=
 github.com/brotherlogic/monitor v0.0.0-20221025152653-c10877c5f9e6/go.mod h1:babny4VO2GqFwjXqhJsP4a6la4XJeMT6f4BgLBPq4G8=
-github.com/brotherlogic/recordadder v0.0.0-20250718015300-425cfbf62531 h1:S8GRMwDAyQ2AxgnMnktUqko6bmkkeGprcxooDnqy6aU=
-github.com/brotherlogic/recordadder v0.0.0-20250718015300-425cfbf62531/go.mod h1:AXCl0DS1L9mfb0xFVJ6JTzNgKdhECIDR2fKN48Guoqs=
+github.com/brotherlogic/recordadder v0.0.0-20250718025210-94cc527fa443 h1:EPeb1rzZ3qCJA25ACsx9e/9NOrRWXSt5oos8aSxYjZ4=
+github.com/brotherlogic/recordadder v0.0.0-20250718025210-94cc527fa443/go.mod h1:JoRZDlW/aCPtSTxD1myZdVMabwK0T/7yznFtdBJRTDo=
 github.com/brotherlogic/recordcollection v0.0.0-20250715205636-bf74e659d908 h1:fEGnnofUS9gMC+xsOp8C0dEfe/4NoDhYwK/MLb5VvuQ=
 github.com/brotherlogic/recordcollection v0.0.0-20250715205636-bf74e659d908/go.mod h1:NnhvH//ryqGgwgMfI9OXqouzrsSQ9VeYoyUuqxhYH+E=
-github.com/brotherlogic/recordscores v0.0.0-20250718005207-7793b91b7467 h1:zLfxLpFT3yP7MvGufwI/LTp2okEvcCPSTiWTGNsM+6k=
-github.com/brotherlogic/recordscores v0.0.0-20250718005207-7793b91b7467/go.mod h1:IfOPFKhB4FrjFHUOHwB9UqDm0bOo4WOZWcjyOrjgHIc=
+github.com/brotherlogic/recordscores v0.0.0-20250718020427-22954c2ffaab h1:N/3RWVrLVNE4fyWxjliDXp0q6f4cJXmE8IPkDnQsKMQ=
+github.com/brotherlogic/recordscores v0.0.0-20250718020427-22954c2ffaab/go.mod h1:QL4ZkYw99yj0pEA/jLupEjtY63hgtplUGgEhrdeRwWo=
 github.com/brotherlogic/versionserver v0.0.0-20221025154054-c9bcd41be2f2 h1:YjFE4Sa+wwbl4yJwJaMQVeA4CMzLIDbbIuSMdsEp5/w=
 github.com/brotherlogic/versionserver v0.0.0-20221025154054-c9bcd41be2f2/go.mod h1:ODrbMDhG+yOp2vie9vE4oaKsKhILDralZMr7PJ4HrJY=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
