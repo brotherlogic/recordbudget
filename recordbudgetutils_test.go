@@ -57,6 +57,10 @@ func (t *trc) getOrder(ctx context.Context, ID int32) (*rcpb.GetOrderResponse, e
 	return &rcpb.GetOrderResponse{}, nil
 }
 
+func (t *trc) getNewOrder(ctx context.Context, ID int32) (*rcpb.GetOrderResponse, error) {
+	return &rcpb.GetOrderResponse{}, nil
+}
+
 func (t *trc) updateRecord(ctx context.Context, iid int32, order *pb.Order) error {
 	return nil
 }
