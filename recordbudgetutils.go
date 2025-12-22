@@ -191,7 +191,7 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 }
 
 func (s *Server) pullNewOrders(ctx context.Context, config *pb.Config) (*pb.Config, error) {
-	s.CtxLog(ctx, fmt.Sprintf("Pulling new orders from this time %v", config.LastOrderPull))
+	s.CtxLog(ctx, fmt.Sprintf("Pulling new orders from this time %v", config.LastNewOrderPull))
 
 	// Order numbers start at zero, so adjust
 	if config.LastNewOrderPull == 0 {
