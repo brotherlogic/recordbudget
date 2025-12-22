@@ -11,9 +11,13 @@ message Config {
   repeated SoldRecord solds = 4;
 
   int32 last_order_pull = 6;
+  int32 last_new_order_pull = 11;
+
   int32 rotate_order_pull = 10;
   repeated Order orders = 5;
+
   int64 last_order_pull_date = 7;
+  int64 last_new_order_pull_date = 12;
 
   repeated Budget budgets = 8;
   int32 tracking = 9;

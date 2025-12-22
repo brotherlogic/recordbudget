@@ -41,10 +41,10 @@ var (
 		Name: "recordbudget_rotate_order",
 		Help: "The amount of potential salve value",
 	})
-	currentOrder = promauto.NewGauge(prometheus.GaugeOpts{
+	currentOrder = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "recordbudget_current_order",
 		Help: "The order number we're currently looking at",
-	})
+	}, []string{"source"})
 	currentOutstandingOrder = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "recordbudget_current_outstanding_order",
 		Help: "The order number we're currently looking at",
@@ -52,7 +52,9 @@ var (
 )
 
 func (s *Server) metrics(ctx context.Context, c *pb.Config) {
-	currentOrder.Set(float64(c.GetLastOrderPull()))
+	currentOrder.With(prometheus.Labels{"source": "old"}).Set(float64(c.GetLastOrderPull()))
+	currentOrder.With(prometheus.Labels{"source": "new"}).Set(float64(c.GetLastNewOrderPull()))
+
 	currentOutstandingOrder.Set(float64(c.Tracking))
 	for _, budget := range c.GetBudgets() {
 		active := "no"
@@ -188,6 +190,86 @@ func (s *Server) pullOrders(ctx context.Context, config *pb.Config) (*pb.Config,
 	return config, nil
 }
 
+func (s *Server) pullNewOrders(ctx context.Context, config *pb.Config) (*pb.Config, error) {
+	s.CtxLog(ctx, fmt.Sprintf("Pulling orders from this time %v", config.LastOrderPull))
+
+	// Order numbers start at zero, so adjust
+	if config.LastNewOrderPull == 0 {
+		config.LastNewOrderPull = 1
+	}
+	s.CtxLog(ctx, fmt.Sprintf("Adjusted to %v", config.LastOrderPull))
+
+	config.LastNewOrderPullDate = time.Now().Unix()
+
+	order, err := s.rc.getNewOrder(ctx, config.LastOrderPull)
+	lastOrderNumber.With(prometheus.Labels{"response": fmt.Sprintf("%v", err)}).Set(float64(config.LastOrderPull))
+	if err != nil {
+		if status.Convert(err).Code() == codes.FailedPrecondition {
+			if config.Tracking == 0 {
+				num, err := s.ImmediateIssue(ctx, "Incomplete Order Alert", fmt.Sprintf("Order %v needs completion: https://www.discogs.com/sell/order/150295-%v", config.LastOrderPull, config.LastOrderPull), true, true)
+				if err != nil {
+					return nil, err
+				}
+				config.Tracking = num.GetNumber()
+			}
+			return config, nil
+		}
+		if status.Convert(err).Code() == codes.NotFound {
+			//Just silently ignore this - and keep moving
+			return config, nil
+		}
+		if status.Convert(err).Code() == codes.DataLoss {
+			// The order has been cancelled
+			if config.GetTracking() > 0 {
+				err = s.DeleteIssue(ctx, config.GetTracking())
+				if err != nil {
+					return nil, err
+				}
+			}
+			config.Tracking = 0
+			config.LastNewOrderPull++
+
+			return config, nil
+		}
+
+		return nil, err
+	}
+
+	if config.GetTracking() > 0 {
+		err := s.DeleteIssue(ctx, config.GetTracking())
+		if err != nil {
+			return nil, err
+		}
+		config.Tracking = 0
+	}
+
+	for id, price := range order.GetListingToPrice() {
+		config.Orders = append(config.Orders, &pb.Order{
+			OrderId:   fmt.Sprintf("152095-%v", config.LastOrderPull),
+			SaleDate:  order.GetSaleDate(),
+			ListingId: id,
+			SalePrice: price,
+		})
+		lastListing.Set(float64(id))
+
+		conn, err := s.FDialServer(ctx, "recordcollection")
+		if err != nil {
+			return nil, err
+		}
+		rcclient := rcpb.NewRecordCollectionServiceClient(conn)
+		rcclient.UpdateRecord(ctx, &rcpb.UpdateRecordRequest{
+			Reason: "Updating because the record has sold",
+			Update: &rcpb.Record{
+				Metadata: &rcpb.ReleaseMetadata{
+					SaleId: id,
+				},
+			}})
+	}
+	config.LastOrderPull++
+
+	return config, nil
+}
+
 func (s *Server) processRec(ctx context.Context, iid int32) error {
 	config, err := s.load(ctx)
 	if err != nil {
@@ -196,6 +278,10 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 
 	if time.Now().Sub(time.Unix(config.GetLastOrderPullDate(), 0)) > time.Hour || (config.GetTracking() > 0 && time.Since(time.Unix(config.GetLastOrderPullDate(), 0)) > time.Minute*5) {
 		config, err := s.pullOrders(ctx, config)
+		if err != nil {
+			return err
+		}
+		config, err = s.pullNewOrders(ctx, config)
 		if err != nil {
 			return err
 		}
