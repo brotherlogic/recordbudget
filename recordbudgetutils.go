@@ -281,11 +281,14 @@ func (s *Server) processRec(ctx context.Context, iid int32) error {
 		if err != nil {
 			return err
 		}
+		s.save(ctx, config)
+	}
+
+	if time.Now().Sub(time.Unix(config.GetLastNewOrderPullDate(), 0)) > time.Hour || (config.GetTracking() > 0 && time.Since(time.Unix(config.GetLastNewOrderPullDate(), 0)) > time.Minute*5) {
 		config, err = s.pullNewOrders(ctx, config)
 		if err != nil {
 			return err
 		}
-		s.save(ctx, config)
 	}
 
 	r, err := s.rc.getRecord(ctx, iid)
