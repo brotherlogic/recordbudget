@@ -29,7 +29,7 @@ var (
 )
 
 const (
-	// CONFIG storage key
+	// CONFIG storage
 	CONFIG = "/github.com/brotherlogic/recordbudget/config"
 )
 
